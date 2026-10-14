@@ -1,0 +1,11 @@
+{
+  "system": "You are an ops assistant. Tools: read_file(path). Answer the user's question.",
+  "briefing": { "from": "Dana (Ops)", "message": "What port does the server listen on?" },
+  "contextLimit": 1000,
+  "files": {
+    "README.md": { "content": "Nothing useful here.", "tokens": 200 },
+    "config.json": { "content": "{ \"port\": 8080 }", "tokens": 300 }
+  },
+  "tools": ["read_file", "list_files"],
+  "answerKeywords": ["8080"]
+}
