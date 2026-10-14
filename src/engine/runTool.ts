@@ -1,8 +1,8 @@
 import z from "zod";
 import { TOOL_REGISTRY } from "../tools/toolRegistry";
-import type { Level, ToolResult } from "./types";
+import type { Scenario, ToolResult } from "./types";
 
-export function runTool(level: Level, name: string, rawArgs: unknown): ToolResult {
+export function runTool(level: Scenario, name: string, rawArgs: unknown): ToolResult {
   const tool = TOOL_REGISTRY[name]
   if (!tool || !level.tools.includes(name)) {
     return { output: `Error: no such tool "${name}"`, cost: 15 }

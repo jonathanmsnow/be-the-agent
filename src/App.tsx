@@ -1,9 +1,9 @@
 import { useEffect, useReducer, useRef, useState } from 'react'
-import levelData from './levels/level1.json'
+import scenario from './scenarios/scenario1.json'
 import { runTool } from './engine/runTool'
-import type { Level, ToolCall } from './engine/types'
+import type { Scenario, ToolCall } from './engine/types'
 
-const level = levelData as Level
+const scenarioData = scenario as Scenario
 
 type Role = 'system' | 'user' | 'you' | 'result'
 interface Entry {
@@ -24,11 +24,11 @@ const estimate = (text: string) => Math.ceil(text.length / 4)
 const initial: State = {
   verdict: null,
   log: [
-    { role: 'system', text: level.system, tokens: estimate(level.system) },
+    { role: 'system', text: scenarioData.system, tokens: estimate(scenarioData.system) },
     {
       role: 'user',
-      text: `${level.briefing.from}: ${level.briefing.message}`,
-      tokens: estimate(level.briefing.message),
+      text: `${scenarioData.briefing.from}: ${scenarioData.briefing.message}`,
+      tokens: estimate(scenarioData.briefing.message),
     },
   ],
 }
@@ -37,7 +37,7 @@ function reducer(state: State, action: Action): State {
   switch (action.type) {
     case 'RUN': {
       const callText = `${action.call.tool} ${action.call.args ? JSON.stringify(action.call.args) : ''}`
-      const { output, cost } = runTool(level, action.call.tool, action.call.args)
+      const { output, cost } = runTool(scenarioData, action.call.tool, action.call.args)
       return {
         ...state,
         log: [
@@ -48,7 +48,7 @@ function reducer(state: State, action: Action): State {
       }
     }
     case 'ANSWER': {
-      const ok = level.answerKeywords.every(k => action.text.includes(k))
+      const ok = scenarioData.answerKeywords.every(k => action.text.includes(k))
       return {
         ...state,
         verdict: ok ? 'Correct!' : 'Not quite.',
@@ -76,7 +76,7 @@ export default function App() {
   const bottomRef = useRef<HTMLDivElement>(null)
 
   const used = state.log.reduce((sum, e) => sum + e.tokens, 0)
-  const pct = Math.min(100, (used / level.contextLimit) * 100)
+  const pct = Math.min(100, (used / scenarioData.contextLimit) * 100)
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -88,7 +88,7 @@ export default function App() {
       <div style={{ position: 'sticky', top: 0, padding: '8px 0', background: 'Canvas' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
           <b>CONTEXT</b>
-          <span>{used} / {level.contextLimit} tokens</span>
+          <span>{used} / {scenarioData.contextLimit} tokens</span>
         </div>
         <div style={{ background: 'rgba(150,150,150,0.3)', height: 10, borderRadius: 5 }}>
           <div
@@ -147,7 +147,7 @@ export default function App() {
             <select
               onChange={e => setTool(e.target.value as 'read_file' | 'list_files')}
             >
-              {level.tools.map(t => (
+              {scenarioData.tools.map(t => (
                 <option key={t} value={t}>
                   {t}
                 </option>

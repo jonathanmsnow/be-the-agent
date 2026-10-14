@@ -1,5 +1,5 @@
 import { z } from 'zod'
-export interface Level {
+export interface Scenario {
   system: string
   briefing: { from: string; message: string }
   contextLimit: number
@@ -19,7 +19,7 @@ export interface ToolDef<S extends z.ZodObject = z.ZodObject> {
   name: string
   description: string
   schema: S
-  run(level: Level, args: z.infer<S>): ToolResult
+  run(level: Scenario, args: z.infer<S>): ToolResult
   terminal?: boolean
 }
 
