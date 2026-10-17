@@ -1,0 +1,1 @@
+export const calculateTokens = (text: string) => text !== '' && text !== undefined && text !== null ? Math.ceil(text.length / 4) : 0

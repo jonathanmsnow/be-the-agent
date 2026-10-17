@@ -1,5 +1,5 @@
 {
-  "system": "You are an ops assistant. Tools: read_file(path). Answer the user's question.",
+  "system": "You are a helpful assistant. Answer the user's question.",
   "briefing": { "from": "Dana (Ops)", "message": "What port does the server listen on?" },
   "contextLimit": 1000,
   "files": {

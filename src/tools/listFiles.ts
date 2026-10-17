@@ -9,8 +9,9 @@ export const listFiles = defineTool({
   }),
   run(level, { path }) {            // path is typed as string
     const files = Object.keys(level.files).filter(p => p.startsWith(path))
+    console.log(`listFiles: path=${path}, files=${files}`)
     return files.length > 0
-      ? { output: files.join('\n'), cost: 10 }
-      : { output: `Error: ${path} not found`, cost: 20 }
+      ? files.join('\n')
+      : `Error: ${path} not found`
   },
 })

@@ -7,6 +7,14 @@ export interface Scenario {
   answerKeywords: string[],
   tools: string[]
 }
+export type Role = 'system' | 'user' | 'you' | 'result'
+
+export interface Entry {
+  role: Role
+  text: string
+  tokens: number
+  evicted?: boolean
+}
 
 export interface ToolCall {
   tool: string,
@@ -19,7 +27,7 @@ export interface ToolDef<S extends z.ZodObject = z.ZodObject> {
   name: string
   description: string
   schema: S
-  run(level: Scenario, args: z.infer<S>): ToolResult
+  run(level: Scenario, args: z.infer<S>): string
   terminal?: boolean
 }
 

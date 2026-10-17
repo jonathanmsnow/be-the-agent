@@ -1,16 +1,14 @@
 import { useEffect, useReducer, useRef, useState } from 'react'
 import scenario from './scenarios/scenario1.json'
 import { runTool } from './engine/runTool'
-import type { Scenario, ToolCall } from './engine/types'
+import type { Entry, Scenario, ToolCall } from './engine/types'
+import { LogEntry } from './components/LogEntry'
+import { prettyPrintToolRegistry as formattedToolRegistry } from './tools/toolRegistry'
+import { calculateTokens } from './utils'
+
 
 const scenarioData = scenario as Scenario
 
-type Role = 'system' | 'user' | 'you' | 'result'
-interface Entry {
-  role: Role
-  text: string
-  tokens: number
-}
 interface State {
   log: Entry[]
   verdict: string | null
@@ -19,16 +17,17 @@ type Action =
   | { type: 'RUN'; call: ToolCall }
   | { type: 'ANSWER'; text: string }
 
-const estimate = (text: string) => Math.ceil(text.length / 4)
+
 
 const initial: State = {
   verdict: null,
   log: [
-    { role: 'system', text: scenarioData.system, tokens: estimate(scenarioData.system) },
+    { role: 'system', text: scenarioData.system, tokens: calculateTokens(scenarioData.system) },
+    { role: 'system', text: `Tools: ${formattedToolRegistry()}`, tokens: calculateTokens(formattedToolRegistry()) },
     {
       role: 'user',
       text: `${scenarioData.briefing.from}: ${scenarioData.briefing.message}`,
-      tokens: estimate(scenarioData.briefing.message),
+      tokens: calculateTokens(scenarioData.briefing.message),
     },
   ],
 }
@@ -42,7 +41,7 @@ function reducer(state: State, action: Action): State {
         ...state,
         log: [
           ...state.log,
-          { role: 'you', text: callText, tokens: estimate(callText) },
+          { role: 'you', text: callText, tokens: calculateTokens(callText) },
           { role: 'result', text: output, tokens: cost },
         ],
       }
@@ -54,18 +53,11 @@ function reducer(state: State, action: Action): State {
         verdict: ok ? 'Correct!' : 'Not quite.',
         log: [
           ...state.log,
-          { role: 'you', text: `answer: ${action.text}`, tokens: estimate(action.text) },
+          { role: 'you', text: `answer: ${action.text}`, tokens: calculateTokens(action.text) },
         ],
       }
     }
   }
-}
-
-const ROLE_STYLE: Record<Role, { label: string; tint: string }> = {
-  system: { label: 'system', tint: 'rgba(150,150,150,0.15)' },
-  user: { label: 'user', tint: 'rgba(80,140,255,0.15)' },
-  you: { label: 'you', tint: 'rgba(80,190,120,0.15)' },
-  result: { label: 'result', tint: 'rgba(240,180,60,0.15)' },
 }
 
 export default function App() {
@@ -97,7 +89,7 @@ export default function App() {
               width: `${pct}%`,
               borderRadius: 5,
               background: pct > 85 ? '#d55' : '#4a8',
-              transition: 'width .3s',
+              transition: 'width .6s',
             }}
           />
         </div>
@@ -106,22 +98,8 @@ export default function App() {
       {/* The log: one flat buffer, role-tagged blocks */}
       <div style={{ paddingBottom: 140 }}>
         {state.log.map((e, i) => (
-          <div
-            key={i}
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '70px 1fr 60px',
-              gap: 8,
-              padding: '6px 8px',
-              marginBottom: 2,
-              background: ROLE_STYLE[e.role].tint,
-              fontSize: 14,
-            }}
-          >
-            <span style={{ opacity: 0.6 }}>[{ROLE_STYLE[e.role].label}]</span>
-            <span style={{ whiteSpace: 'pre-wrap' }}>{e.text}</span>
-            <span style={{ opacity: 0.5, textAlign: 'right' }}>{e.tokens}t</span>
-          </div>
+          // Use LogEntry component to replace div
+          <LogEntry key={i} entry={e} />
         ))}
         {state.verdict && <p><b>{state.verdict}</b></p>}
         <div ref={bottomRef} />
