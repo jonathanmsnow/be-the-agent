@@ -24,6 +24,13 @@ export interface ToolCall {
   args: unknown;
 }
 
+export const ActionType = {
+  RUN: "RUN",
+  ANSWER: "ANSWER",
+} as const;
+
+export type ActionType = (typeof ActionType)[keyof typeof ActionType];
+
 export interface ToolResult {
   output: string;
   cost: number;

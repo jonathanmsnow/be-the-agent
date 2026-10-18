@@ -2,7 +2,12 @@ import { useReducer, useState, useRef, useEffect } from "react";
 import { LogEntry } from "../components/LogEntry";
 import { contextIndicator } from "../components/contextIndicator";
 import { runTool } from "../engine/runTool";
-import type { Entry, Scenario, ToolCall } from "../engine/types";
+import {
+  ActionType,
+  type Entry,
+  type Scenario,
+  type ToolCall,
+} from "../engine/types";
 import { prettyPrintToolRegistry as formattedToolRegistry } from "../tools/toolRegistry";
 import { calculateTokens } from "../utils";
 
@@ -11,9 +16,11 @@ interface State {
   verdict: string | null;
 }
 
-type Action =
-  | { type: "RUN"; call: ToolCall }
-  | { type: "ANSWER"; text: string };
+type Action = {
+  type: ActionType;
+  call?: ToolCall;
+  text?: string;
+};
 
 const initial: State = {
   verdict: null,
@@ -44,18 +51,14 @@ function createInitialState(scenarioData: Scenario): State {
   };
 }
 
-function reducer(
-  state: State,
-  action: Action,
-  scenarioData: Scenario,
-): State {
+function reducer(state: State, action: Action, scenarioData: Scenario): State {
   switch (action.type) {
-    case "RUN": {
-      const callText = `${action.call.tool} ${action.call.args ? JSON.stringify(action.call.args) : ""}`;
+    case ActionType.RUN: {
+      const callText = `${action.call?.tool} ${action.call?.args ? JSON.stringify(action.call.args) : ""}`;
       const { output, cost } = runTool(
         scenarioData,
-        action.call.tool,
-        action.call.args,
+        action.call?.tool,
+        action.call?.args,
       );
       return {
         ...state,
@@ -66,9 +69,9 @@ function reducer(
         ],
       };
     }
-    case "ANSWER": {
+    case ActionType.ANSWER: {
       const ok = scenarioData.answerKeywords.every((k) =>
-        action.text.includes(k),
+        action.text?.includes(k),
       );
       return {
         ...state,
@@ -78,7 +81,7 @@ function reducer(
           {
             role: "you",
             text: `answer: ${action.text}`,
-            tokens: calculateTokens(action.text),
+            tokens: calculateTokens(action.text || ""),
           },
         ],
       };
@@ -102,39 +105,39 @@ export function Simulator({
   const [path, setPath] = useState("");
   const [tool, setTool] = useState<"read_file" | "list_files">("read_file");
   const [answer, setAnswer] = useState("");
+  const [toolsWidth, setToolsWidth] = useState(38);
+  const simulatorRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  const used = state.log.reduce((sum, e) => sum + e.tokens, 0);
-  const pct = Math.min(100, (used / scenarioData.contextLimit) * 100);
+  const used: number = state.log.reduce((sum, e) => sum + e.tokens, 0);
+  const pct: number = Math.min(100, (used / scenarioData.contextLimit) * 100);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [state.log.length]);
 
+  const resizeFromPointer = (clientX: number) => {
+    const bounds = simulatorRef.current?.getBoundingClientRect();
+    if (!bounds) return;
+    const nextWidth = ((clientX - bounds.left) / bounds.width) * 100;
+    setToolsWidth(Math.min(65, Math.max(25, nextWidth)));
+  };
+
+  /* eslint-disable jsx-a11y-x/no-noninteractive-element-interactions, jsx-a11y-x/no-noninteractive-tabindex */
   return (
-    <div className="simulator">
-      <header className="simulator-header">
-        <button className="back-button" onClick={onBack}>
-          ← All scenarios
-        </button>
-        <span className="simulator-label">LIVE SIMULATOR</span>
-      </header>
-      {contextIndicator(used, scenarioData, pct)}
-
-      <div className="log">
-        {state.log.map((e, i) => (
-          <LogEntry key={i} entry={e} />
-        ))}
-        {state.verdict && (
-          <p>
-            <b>{state.verdict}</b>
-          </p>
-        )}
-        <div ref={bottomRef} />
-      </div>
-
-      <div className="composer">
-        <div className="composer-inner">
+    <div
+      ref={simulatorRef}
+      className="simulator"
+      style={{ gridTemplateColumns: `${toolsWidth}% 8px 1fr` }}
+    >
+      <aside className="tools-pane">
+        <header className="simulator-header">
+          <button className="back-button" onClick={onBack}>
+            ← All scenarios
+          </button>
+          <span className="simulator-label">TOOLS</span>
+        </header>
+        <div className="composer">
           <div className="composer-label">
             YOUR TURN: emit one tool call, or answer
           </div>
@@ -180,7 +183,60 @@ export function Simulator({
             </button>
           </div>
         </div>
-      </div>
+      </aside>
+
+      <div
+        className="pane-divider"
+        role="separator"
+        aria-orientation="vertical"
+        aria-label="Resize tools pane"
+        aria-valuemin={25}
+        aria-valuemax={65}
+        aria-valuenow={toolsWidth}
+        tabIndex={0}
+        onPointerDown={(event) => {
+          event.currentTarget.setPointerCapture(event.pointerId);
+          resizeFromPointer(event.clientX);
+        }}
+        onPointerMove={(event) => {
+          if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+            resizeFromPointer(event.clientX);
+          }
+        }}
+        onPointerUp={(event) => {
+          if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+            event.currentTarget.releasePointerCapture(event.pointerId);
+          }
+        }}
+        onKeyDown={(event) => {
+          if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+            event.preventDefault();
+            const delta = event.key === "ArrowLeft" ? -2 : 2;
+            setToolsWidth((width) => Math.min(65, Math.max(25, width + delta)));
+          }
+        }}
+      />
+      <main className="chat-pane">
+        <div className="simulator-sticky">
+          <header className="simulator-header">
+            <span className="simulator-label">LIVE SIMULATOR</span>
+          </header>
+          {contextIndicator(used, scenarioData, pct)}
+        </div>
+
+        <div className="log">
+          {state.log.map((e, i) => (
+            <LogEntry key={i} entry={e} />
+          ))}
+          {state.verdict && (
+            <p>
+              <b>{state.verdict}</b>
+            </p>
+          )}
+          <div ref={bottomRef} />
+        </div>
+      </main>
     </div>
   );
+  /* eslint-enable jsx-a11y-x/no-noninteractive-element-interactions, jsx-a11y-x/no-noninteractive-tabindex */
 }

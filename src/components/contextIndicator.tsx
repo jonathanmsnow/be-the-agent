@@ -1,7 +1,7 @@
 import type { Scenario } from "../engine/types";
 
 export function contextIndicator(
-  used: any,
+  used: number,
   scenarioData: Scenario,
   pct: number,
 ) {

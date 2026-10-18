@@ -182,11 +182,50 @@
   }
 
 .simulator {
-    width: min(700px, calc(100% - 32px));
-    margin: 0 auto;
-    padding-bottom: 150px;
+    display: grid;
+    width: 100%;
+    height: 100svh;
+    overflow: hidden;
     text-align: left;
     font-family: var(--mono);
+  }
+
+.tools-pane,
+.chat-pane {
+    min-width: 0;
+    overflow: auto;
+  }
+
+.tools-pane {
+    padding: 0 18px;
+  }
+
+.chat-pane {
+    min-width: 0;
+  }
+
+.pane-divider {
+    width: 8px;
+    min-height: 100%;
+    padding: 0;
+    border: 0;
+    border-inline: 1px solid var(--border);
+    background: var(--code-bg);
+    cursor: col-resize;
+    touch-action: none;
+  }
+
+.pane-divider:hover,
+.pane-divider:focus-visible {
+    background: var(--accent-bg);
+    outline: 0;
+  }
+
+.simulator-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--bg);
   }
 
 .simulator-header {
@@ -208,11 +247,7 @@
   }
 
 .context-meter {
-    position: sticky;
-    top: 0;
-    z-index: 1;
     padding: 10px 0 12px;
-    background: var(--bg);
   }
 
 .context-meter-label {
@@ -241,23 +276,16 @@
   }
 
 .log {
+    width: 100%;
     padding-bottom: 16px;
   }
 
 .composer {
-    position: fixed;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 2;
-    padding: 12px;
-    border-top: 1px solid var(--border);
-    background: color-mix(in srgb, var(--bg) 94%, transparent);
-    backdrop-filter: blur(8px);
+    padding: 12px 0;
   }
 
 .composer-inner {
-    width: min(700px, 100%);
+    width: 100%;
     margin: 0 auto;
   }
 
@@ -320,5 +348,34 @@
     }
 
   .simulator {
-      width: min(100% - 20px, 700px);
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: 100svh;
+    overflow: visible;
+  }
+
+  .tools-pane,
+  .chat-pane {
+    overflow: visible;
+  }
+
+  .tools-pane {
+    padding: 0 10px;
+  }
+
+  .chat-pane {
+    display: contents;
+  }
+
+  .pane-divider {
+    display: none;
+  }
+
+  .simulator-sticky {
+    position: static;
+  }
+
+  .log {
+    padding-bottom: 16px;
   }
