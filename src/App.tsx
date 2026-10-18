@@ -1,12 +1,17 @@
 import { useEffect, useReducer, useRef, useState } from "react";
-import scenario from "./scenarios/scenario1.json";
 import { runTool } from "./engine/runTool";
 import type { Entry, Scenario, ToolCall } from "./engine/types";
 import { LogEntry } from "./components/LogEntry";
 import { prettyPrintToolRegistry as formattedToolRegistry } from "./tools/toolRegistry";
 import { calculateTokens } from "./utils";
+import { LandingPage } from "./pages/LandingPage";
 
-const scenarioData = scenario as Scenario;
+interface ScenarioCard {
+  id: string;
+  title: string;
+  description: string;
+  scenario: Scenario;
+}
 
 interface State {
   log: Entry[];
@@ -18,26 +23,34 @@ type Action =
 
 const initial: State = {
   verdict: null,
-  log: [
-    {
-      role: "system",
-      text: scenarioData.system,
-      tokens: calculateTokens(scenarioData.system),
-    },
-    {
-      role: "system",
-      text: `Tools: ${formattedToolRegistry()}`,
-      tokens: calculateTokens(formattedToolRegistry()),
-    },
-    {
-      role: "user",
-      text: `${scenarioData.briefing.from}: ${scenarioData.briefing.message}`,
-      tokens: calculateTokens(scenarioData.briefing.message),
-    },
-  ],
+  log: [],
 };
 
-function reducer(state: State, action: Action): State {
+function createInitialState(scenarioData: Scenario): State {
+  const tools = formattedToolRegistry();
+  return {
+    verdict: null,
+    log: [
+      {
+        role: "system",
+        text: scenarioData.system,
+        tokens: calculateTokens(scenarioData.system),
+      },
+      {
+        role: "system",
+        text: `Tools: ${tools}`,
+        tokens: calculateTokens(tools),
+      },
+      {
+        role: "user",
+        text: `${scenarioData.briefing.from}: ${scenarioData.briefing.message}`,
+        tokens: calculateTokens(scenarioData.briefing.message),
+      },
+    ],
+  };
+}
+
+function reducer(state: State, action: Action, scenarioData: Scenario): State {
   switch (action.type) {
     case "RUN": {
       const callText = `${action.call.tool} ${action.call.args ? JSON.stringify(action.call.args) : ""}`;
@@ -75,8 +88,19 @@ function reducer(state: State, action: Action): State {
   }
 }
 
-export default function App() {
-  const [state, dispatch] = useReducer(reducer, initial);
+function Simulator({
+  scenarioData,
+  onBack,
+}: {
+  scenarioData: Scenario;
+  onBack: () => void;
+}) {
+  const [state, dispatch] = useReducer(
+    (currentState: State, action: Action) =>
+      reducer(currentState, action, scenarioData),
+    initial,
+    () => createInitialState(scenarioData),
+  );
   const [path, setPath] = useState("");
   const [tool, setTool] = useState<"read_file" | "list_files">("read_file");
   const [answer, setAnswer] = useState("");
@@ -90,59 +114,31 @@ export default function App() {
   }, [state.log.length]);
 
   return (
-    <div
-      style={{
-        maxWidth: 700,
-        margin: "0 auto",
-        textAlign: "left",
-        fontFamily: "monospace",
-      }}
-    >
-      {/* Header: label + meter */}
-      <div
-        style={{
-          position: "sticky",
-          top: 0,
-          padding: "8px 0",
-          background: "Canvas",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            fontSize: 13,
-          }}
-        >
+    <div className="simulator">
+      <header className="simulator-header">
+        <button className="back-button" onClick={onBack}>
+          ← All scenarios
+        </button>
+        <span className="simulator-label">LIVE SIMULATOR</span>
+      </header>
+      <div className="context-meter">
+        <div className="context-meter-label">
           <b>CONTEXT</b>
           <span>
             {used} / {scenarioData.contextLimit} tokens
           </span>
         </div>
 
-        <div
-          style={{
-            background: "rgba(150,150,150,0.3)",
-            height: 10,
-            borderRadius: 5,
-          }}
-        >
+        <div className="context-meter-track">
           <div
-            style={{
-              height: "100%",
-              width: `${pct}%`,
-              borderRadius: 5,
-              background: pct > 85 ? "#d55" : "#4a8",
-              transition: "width .6s",
-            }}
+            className={`context-meter-fill ${pct > 85 ? "danger" : ""}`}
+            style={{ width: `${pct}%` }}
           />
         </div>
       </div>
 
-      {/* The log: one flat buffer, role-tagged blocks */}
-      <div style={{ paddingBottom: 140 }}>
+      <div className="log">
         {state.log.map((e, i) => (
-          // Use LogEntry component to replace div
           <LogEntry key={i} entry={e} />
         ))}
         {state.verdict && (
@@ -153,23 +149,12 @@ export default function App() {
         <div ref={bottomRef} />
       </div>
 
-      {/* Your turn: pinned composer */}
-      <div
-        style={{
-          position: "fixed",
-          bottom: 0,
-          left: 0,
-          right: 0,
-          background: "Canvas",
-          borderTop: "1px solid rgba(150,150,150,0.4)",
-          padding: 12,
-        }}
-      >
-        <div style={{ maxWidth: 700, margin: "0 auto" }}>
-          <div style={{ fontSize: 12, opacity: 0.6, marginBottom: 6 }}>
+      <div className="composer">
+        <div className="composer-inner">
+          <div className="composer-label">
             YOUR TURN: emit one tool call, or answer
           </div>
-          <div style={{ display: "flex", gap: 6, marginBottom: 6 }}>
+          <div className="composer-row">
             <select
               onChange={(e) =>
                 setTool(e.target.value as "read_file" | "list_files")
@@ -182,27 +167,31 @@ export default function App() {
               ))}
             </select>
             <input
-              style={{ flex: 1 }}
+              className="composer-input"
               value={path}
               onChange={(e) => setPath(e.target.value)}
               placeholder="path"
             />
             <button
+              className="action-button"
               onClick={() =>
-                dispatch({ type: "RUN", call: { tool: tool, args: { path } } })
+                dispatch({ type: "RUN", call: { tool, args: { path } } })
               }
             >
               Run
             </button>
           </div>
-          <div style={{ display: "flex", gap: 6 }}>
+          <div className="composer-row">
             <input
-              style={{ flex: 1 }}
+              className="composer-input"
               value={answer}
               onChange={(e) => setAnswer(e.target.value)}
               placeholder="your answer to the user"
             />
-            <button onClick={() => dispatch({ type: "ANSWER", text: answer })}>
+            <button
+              className="action-button"
+              onClick={() => dispatch({ type: "ANSWER", text: answer })}
+            >
               Answer
             </button>
           </div>
@@ -210,4 +199,21 @@ export default function App() {
       </div>
     </div>
   );
+}
+
+export default function App() {
+  const [selectedScenario, setSelectedScenario] = useState<ScenarioCard | null>(
+    null,
+  );
+
+  if (selectedScenario) {
+    return (
+      <Simulator
+        scenarioData={selectedScenario.scenario}
+        onBack={() => setSelectedScenario(null)}
+      />
+    );
+  }
+
+  return <LandingPage />;
 }

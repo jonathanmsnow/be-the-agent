@@ -1,6 +1,12 @@
 {
+  "id": "scenario1",
+  "title": "Server Port Inquiry",
+  "description": "A scenario where the user needs to find out the port number on which the server is listening.",
   "system": "You are a helpful assistant. Answer the user's question.",
-  "briefing": { "from": "Dana (Ops)", "message": "What port does the server listen on?" },
+  "briefing": {
+    "from": "Dana (Ops)",
+    "message": "What port does the server listen on?"
+  },
   "contextLimit": 1000,
   "files": {
     "README.md": { "content": "Nothing useful here.", "tokens": 200 },
