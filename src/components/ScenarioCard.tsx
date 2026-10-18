@@ -24,7 +24,7 @@ export interface ScenarioCard {
 export function ScenarioCard({ scenario, onAction }: ScenarioCard) {
   return (
     <article className="scenario-card" key={scenario.id}>
-      <div className="scenario-icon">✦</div>
+      <div className="scenario-icon" aria-hidden="true">✦</div>
       <div className="scenario-card-content">
         <h3>{scenario.title}</h3>
         <p>{scenario.description}</p>

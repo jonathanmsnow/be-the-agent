@@ -15,7 +15,18 @@ export function runTool(
   if (!tool || !level.tools.includes(name)) {
     return { output: `Error: no such tool "${name}"`, cost: 15 };
   }
-  const parsed = tool.schema.safeParse(rawArgs);
+  let args = rawArgs;
+  if (typeof rawArgs === "string") {
+    try {
+      args = JSON.parse(rawArgs);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Invalid JSON body";
+      const output = `Error: invalid JSON body\n${message}`;
+      return { output, cost: calculateTokens(output) };
+    }
+  }
+  const parsed = tool.schema.safeParse(args);
   if (!parsed.success) {
     return {
       output: `Error: invalid arguments\n${z.prettifyError(parsed.error)}`,

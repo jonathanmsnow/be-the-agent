@@ -8,7 +8,10 @@ import {
   type Scenario,
   type ToolCall,
 } from "../engine/types";
-import { prettyPrintToolRegistry as formattedToolRegistry } from "../tools/toolRegistry";
+import {
+  TOOL_REGISTRY,
+  prettyPrintToolRegistry as formattedToolRegistry,
+} from "../tools/toolRegistry";
 import { calculateTokens } from "../utils";
 
 interface State {
@@ -21,6 +24,10 @@ type Action = {
   call?: ToolCall;
   text?: string;
 };
+
+function requestTemplate(toolName: string) {
+  return JSON.stringify({ tool: toolName, args: { path: "" } }, null, 2);
+}
 
 const initial: State = {
   verdict: null,
@@ -54,7 +61,13 @@ function createInitialState(scenarioData: Scenario): State {
 function reducer(state: State, action: Action, scenarioData: Scenario): State {
   switch (action.type) {
     case ActionType.RUN: {
-      const callText = `${action.call?.tool} ${action.call?.args ? JSON.stringify(action.call.args) : ""}`;
+      const callText = `${action.call?.tool} ${
+        typeof action.call?.args === "string"
+          ? action.call.args
+          : action.call?.args
+            ? JSON.stringify(action.call.args)
+            : ""
+      }`;
       const { output, cost } = runTool(
         scenarioData,
         action.call?.tool,
@@ -102,8 +115,11 @@ export function Simulator({
     initial,
     () => createInitialState(scenarioData),
   );
-  const [path, setPath] = useState("");
-  const [tool, setTool] = useState<"read_file" | "list_files">("read_file");
+  const [selectedTool, setSelectedTool] = useState(scenarioData.tools[0] || "");
+  const [rawRequest, setRawRequest] = useState(() =>
+    requestTemplate(scenarioData.tools[0] || ""),
+  );
+  const [requestError, setRequestError] = useState("");
   const [answer, setAnswer] = useState("");
   const [toolsWidth, setToolsWidth] = useState(38);
   const simulatorRef = useRef<HTMLDivElement>(null);
@@ -135,41 +151,102 @@ export function Simulator({
           <button className="back-button" onClick={onBack}>
             ← All scenarios
           </button>
-          <span className="simulator-label">TOOLS</span>
+          <span className="simulator-label">Agent Tools</span>
         </header>
-        <div className="composer">
-          <div className="composer-label">
-            YOUR TURN: emit one tool call, or answer
+        <div className="tool-client">
+          <div className="tool-section-label">COLLECTION / TOOLS</div>
+          <div
+            className="tool-list"
+            role="listbox"
+            aria-label="Available tools"
+          >
+            {scenarioData.tools.map((toolName) => {
+              return (
+                <button
+                  className={`tool-item${selectedTool === toolName ? " selected" : ""}`}
+                  key={toolName}
+                  role="option"
+                  aria-selected={selectedTool === toolName}
+                  onClick={() => {
+                    setSelectedTool(toolName);
+                    setRawRequest(requestTemplate(toolName));
+                    setRequestError("");
+                  }}
+                >
+                  <span className="tool-method">POST</span>
+                  <span>{toolName}</span>
+                </button>
+              );
+            })}
           </div>
-          <div className="composer-row">
-            <select
-              onChange={(e) =>
-                setTool(e.target.value as "read_file" | "list_files")
-              }
-            >
-              {scenarioData.tools.map((t) => (
-                <option key={t} value={t}>
-                  {t}
-                </option>
-              ))}
-            </select>
-            <input
-              className="composer-input"
-              value={path}
-              onChange={(e) => setPath(e.target.value)}
-              placeholder="path"
+
+          <div className="tool-request">
+            <div className="tool-request-heading">
+              <span className="tool-method">POST</span>
+              <strong>{selectedTool || "Select a tool"}</strong>
+            </div>
+            <p className="tool-description">
+              {TOOL_REGISTRY[selectedTool]?.description}
+            </p>
+            <label className="request-label" htmlFor="raw-tool-request">
+              Request body · JSON
+            </label>
+            <textarea
+              id="raw-tool-request"
+              className="request-editor"
+              value={rawRequest}
+              onChange={(event) => {
+                setRawRequest(event.target.value);
+                setRequestError("");
+              }}
+              spellCheck={false}
+              aria-describedby={requestError ? "request-error" : undefined}
             />
+            {requestError && (
+              <p className="request-error" id="request-error" role="alert">
+                {requestError}
+              </p>
+            )}
             <button
-              className="action-button"
-              onClick={() =>
-                dispatch({ type: "RUN", call: { tool, args: { path } } })
-              }
+              className="action-button send-button"
+              onClick={() => {
+                try {
+                  const request = JSON.parse(rawRequest) as ToolCall;
+                  if (
+                    typeof request.tool !== "string" ||
+                    !Object.prototype.hasOwnProperty.call(request, "args")
+                  ) {
+                    throw new Error('JSON must include "tool" and "args".');
+                  }
+                  setRequestError("");
+                  dispatch({ type: ActionType.RUN, call: request });
+                } catch (error) {
+                  if (error instanceof SyntaxError) {
+                    setRequestError("");
+                    dispatch({
+                      type: ActionType.RUN,
+                      call: { tool: selectedTool, args: rawRequest },
+                    });
+                    return;
+                  }
+                  setRequestError(
+                    error instanceof Error
+                      ? error.message
+                      : "Could not send request.",
+                  );
+                }
+              }}
             >
-              Run
+              Send request
             </button>
           </div>
-          <div className="composer-row">
+
+          <div className="answer-section">
+            <label className="request-label" htmlFor="answer-input">
+              Final answer
+            </label>
             <input
+              id="answer-input"
               className="composer-input"
               value={answer}
               onChange={(e) => setAnswer(e.target.value)}
@@ -177,9 +254,11 @@ export function Simulator({
             />
             <button
               className="action-button"
-              onClick={() => dispatch({ type: "ANSWER", text: answer })}
+              onClick={() =>
+                dispatch({ type: ActionType.ANSWER, text: answer })
+              }
             >
-              Answer
+              Submit answer
             </button>
           </div>
         </div>
