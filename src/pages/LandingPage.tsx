@@ -1,8 +1,13 @@
 import type { JSX } from "react/jsx-runtime";
 import { ScenarioCard } from "../components/ScenarioCard";
 import { scenarios } from "../scenarios/scenarios";
+import type { Scenario } from "../engine/types";
 
-export function LandingPage(): JSX.Element {
+export function LandingPage({
+  setSelectedScenario,
+}: {
+  setSelectedScenario: (scenario: Scenario) => void;
+}): JSX.Element {
   return (
     <main className="landing">
       <section className="hero">
@@ -28,7 +33,7 @@ export function LandingPage(): JSX.Element {
             ScenarioCard({
               scenario: scenario,
               onAction: () => {
-                console.log(`Selected scenario: ${scenario.title}`);
+                setSelectedScenario(scenario);
               },
             }),
           )}
