@@ -1,6 +1,7 @@
 import { useReducer, useState, useRef, useEffect } from "react";
 import { LogEntry } from "../components/LogEntry";
-import { contextIndicator } from "../components/contextIndicator";
+import { contextIndicator } from "../components/ContextTracker";
+import { ToolView } from "../components/ToolView";
 import { runTool } from "../engine/runTool";
 import {
   ActionType,
@@ -24,10 +25,6 @@ type Action = {
   call?: ToolCall;
   text?: string;
 };
-
-function requestTemplate(toolName: string) {
-  return JSON.stringify({ tool: toolName, args: { path: "" } }, null, 2);
-}
 
 const initial: State = {
   verdict: null,
@@ -115,12 +112,7 @@ export function Simulator({
     initial,
     () => createInitialState(scenarioData),
   );
-  const [selectedTool, setSelectedTool] = useState(scenarioData.tools[0] || "");
-  const [rawRequest, setRawRequest] = useState(() =>
-    requestTemplate(scenarioData.tools[0] || ""),
-  );
-  const [requestError, setRequestError] = useState("");
-  const [answer, setAnswer] = useState("");
+
   const [toolsWidth, setToolsWidth] = useState(38);
   const simulatorRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -153,115 +145,13 @@ export function Simulator({
           </button>
           <span className="simulator-label">Agent Tools</span>
         </header>
-        <div className="tool-client">
-          <div className="tool-section-label">COLLECTION / TOOLS</div>
-          <div
-            className="tool-list"
-            role="listbox"
-            aria-label="Available tools"
-          >
-            {scenarioData.tools.map((toolName) => {
-              return (
-                <button
-                  className={`tool-item${selectedTool === toolName ? " selected" : ""}`}
-                  key={toolName}
-                  role="option"
-                  aria-selected={selectedTool === toolName}
-                  onClick={() => {
-                    setSelectedTool(toolName);
-                    setRawRequest(requestTemplate(toolName));
-                    setRequestError("");
-                  }}
-                >
-                  <span className="tool-method">POST</span>
-                  <span>{toolName}</span>
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="tool-request">
-            <div className="tool-request-heading">
-              <span className="tool-method">POST</span>
-              <strong>{selectedTool || "Select a tool"}</strong>
-            </div>
-            <p className="tool-description">
-              {TOOL_REGISTRY[selectedTool]?.description}
-            </p>
-            <label className="request-label" htmlFor="raw-tool-request">
-              Request body · JSON
-            </label>
-            <textarea
-              id="raw-tool-request"
-              className="request-editor"
-              value={rawRequest}
-              onChange={(event) => {
-                setRawRequest(event.target.value);
-                setRequestError("");
-              }}
-              spellCheck={false}
-              aria-describedby={requestError ? "request-error" : undefined}
-            />
-            {requestError && (
-              <p className="request-error" id="request-error" role="alert">
-                {requestError}
-              </p>
-            )}
-            <button
-              className="action-button send-button"
-              onClick={() => {
-                try {
-                  const request = JSON.parse(rawRequest) as ToolCall;
-                  if (
-                    typeof request.tool !== "string" ||
-                    !Object.prototype.hasOwnProperty.call(request, "args")
-                  ) {
-                    throw new Error('JSON must include "tool" and "args".');
-                  }
-                  setRequestError("");
-                  dispatch({ type: ActionType.RUN, call: request });
-                } catch (error) {
-                  if (error instanceof SyntaxError) {
-                    setRequestError("");
-                    dispatch({
-                      type: ActionType.RUN,
-                      call: { tool: selectedTool, args: rawRequest },
-                    });
-                    return;
-                  }
-                  setRequestError(
-                    error instanceof Error
-                      ? error.message
-                      : "Could not send request.",
-                  );
-                }
-              }}
-            >
-              Send request
-            </button>
-          </div>
-
-          <div className="answer-section">
-            <label className="request-label" htmlFor="answer-input">
-              Final answer
-            </label>
-            <input
-              id="answer-input"
-              className="composer-input"
-              value={answer}
-              onChange={(e) => setAnswer(e.target.value)}
-              placeholder="your answer to the user"
-            />
-            <button
-              className="action-button"
-              onClick={() =>
-                dispatch({ type: ActionType.ANSWER, text: answer })
-              }
-            >
-              Submit answer
-            </button>
-          </div>
-        </div>
+        <ToolView
+          tools={scenarioData.tools.flatMap((name) => {
+            const tool = TOOL_REGISTRY[name];
+            return tool ? [tool] : [];
+          })}
+          dispatch={dispatch}
+        />
       </aside>
 
       <div
