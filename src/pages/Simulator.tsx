@@ -1,8 +1,7 @@
 import { useReducer, useState, useRef, useEffect } from "react";
 import { LogEntry } from "../components/LogEntry";
-import { contextIndicator } from "../components/ContextTracker";
+import { ContextIndicator } from "../components/ContextTracker";
 import { ToolView } from "../components/ToolView";
-import { runTool } from "../engine/runTool";
 import {
   ActionType,
   type Entry,
@@ -14,13 +13,14 @@ import {
   prettyPrintToolRegistry as formattedToolRegistry,
 } from "../tools/toolRegistry";
 import { calculateTokens } from "../utils";
+import { reducer } from "./reducer";
 
-interface State {
+export interface State {
   log: Entry[];
   verdict: string | null;
 }
 
-type Action = {
+export type Action = {
   type: ActionType;
   call?: ToolCall;
   text?: string;
@@ -53,50 +53,6 @@ function createInitialState(scenarioData: Scenario): State {
       },
     ],
   };
-}
-
-function reducer(state: State, action: Action, scenarioData: Scenario): State {
-  switch (action.type) {
-    case ActionType.RUN: {
-      const callText = `${action.call?.tool} ${
-        typeof action.call?.args === "string"
-          ? action.call.args
-          : action.call?.args
-            ? JSON.stringify(action.call.args)
-            : ""
-      }`;
-      const { output, cost } = runTool(
-        scenarioData,
-        action.call?.tool,
-        action.call?.args,
-      );
-      return {
-        ...state,
-        log: [
-          ...state.log,
-          { role: "you", text: callText, tokens: calculateTokens(callText) },
-          { role: "result", text: output, tokens: cost },
-        ],
-      };
-    }
-    case ActionType.ANSWER: {
-      const ok = scenarioData.answerKeywords.every((k) =>
-        action.text?.includes(k),
-      );
-      return {
-        ...state,
-        verdict: ok ? "Correct!" : "Not quite.",
-        log: [
-          ...state.log,
-          {
-            role: "you",
-            text: `answer: ${action.text}`,
-            tokens: calculateTokens(action.text || ""),
-          },
-        ],
-      };
-    }
-  }
 }
 
 export function Simulator({
@@ -190,7 +146,12 @@ export function Simulator({
           <header className="simulator-header">
             <span className="simulator-label">LIVE SIMULATOR</span>
           </header>
-          {contextIndicator(used, scenarioData, pct)}
+          <ContextIndicator
+            used={used}
+            scenarioData={scenarioData}
+            pct={pct}
+            entries={state.log}
+          />
         </div>
 
         <div className="log">

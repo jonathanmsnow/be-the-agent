@@ -11,7 +11,6 @@ export function LandingPage({
   return (
     <main className="landing">
       <section className="hero">
-        <div className="eyebrow">BE THE AGENT</div>
         <h1>Think like an agent.</h1>
         <p>
           Practice navigating messy context, choosing the right tools, and
