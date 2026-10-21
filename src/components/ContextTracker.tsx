@@ -1,11 +1,11 @@
 import { useState } from "react";
-import type { Entry, Scenario } from "../engine/types";
+import { ROLE, type Entry, type Scenario } from "../engine/types";
 
 const resourceLabels = {
-  result: "Tools",
-  you: "Agent output",
-  user: "User",
-  system: "System",
+  [ROLE.RESULT]: "Tools",
+  [ROLE.AGENT]: "Agent output",
+  [ROLE.USER]: "User",
+  [ROLE.SYSTEM]: "System",
 } as const;
 
 type ResourceRole = keyof typeof resourceLabels;

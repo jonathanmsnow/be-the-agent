@@ -1,8 +1,23 @@
 import { runTool } from "../engine/runTool";
-import { type Scenario, ActionType } from "../engine/types";
+import {
+  type Entry,
+  type Scenario,
+  type ToolCall,
+  ActionType,
+  ROLE,
+} from "../engine/types";
 import { calculateTokens } from "../utils";
-import type { State, Action } from "./Simulator";
 
+export interface State {
+  log: Entry[];
+  hintIndex: number;
+}
+
+export type Action = {
+  type: ActionType;
+  call?: ToolCall;
+  text?: string;
+};
 export function reducer(
   state: State,
   action: Action,
@@ -26,8 +41,12 @@ export function reducer(
         ...state,
         log: [
           ...state.log,
-          { role: "you", text: callText, tokens: calculateTokens(callText) },
-          { role: "result", text: output, tokens: cost },
+          {
+            role: ROLE.AGENT,
+            text: callText,
+            tokens: calculateTokens(callText),
+          },
+          { role: ROLE.RESULT, text: output, tokens: cost },
         ],
       };
     }
@@ -37,15 +56,35 @@ export function reducer(
       );
       return {
         ...state,
-        verdict: ok ? "Correct!" : "Not quite.",
         log: [
           ...state.log,
           {
-            role: "you",
-            text: `answer: ${action.text}`,
+            role: ROLE.AGENT,
+            text: `${action.text}`,
             tokens: calculateTokens(action.text || ""),
           },
+          {
+            role: ROLE.USER,
+            text: ok
+              ? scenarioData.answerResponses.correct
+              : scenarioData.answerResponses.incorrect,
+            tokens: calculateTokens(
+              ok
+                ? scenarioData.answerResponses.correct
+                : scenarioData.answerResponses.incorrect,
+            ),
+          },
+          ...(!ok && scenarioData.hints[state.hintIndex]
+            ? [
+                {
+                  role: ROLE.USER,
+                  text: scenarioData.hints[state.hintIndex],
+                  tokens: calculateTokens(scenarioData.hints[state.hintIndex]),
+                },
+              ]
+            : []),
         ],
+        hintIndex: ok ? state.hintIndex : state.hintIndex + 1,
       };
     }
   }

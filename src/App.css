@@ -198,6 +198,8 @@
 
 .tools-pane {
     padding: 0 18px;
+    display: flex;
+    flex-direction: column;
   }
 
 .chat-pane {
@@ -353,6 +355,10 @@
   }
 
 .tool-client {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    flex-direction: column;
     padding: 12px 0 24px;
   }
 
@@ -462,9 +468,9 @@
   }
 
 .answer-section {
+    margin-top: auto;
     display: grid;
     gap: 7px;
-    margin-top: 28px;
     padding-top: 16px;
     border-top: 1px solid var(--border);
   }

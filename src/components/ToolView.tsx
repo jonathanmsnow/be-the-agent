@@ -116,20 +116,20 @@ export function ToolView({
 
       <div className="answer-section">
         <label className="request-label" htmlFor="answer-input">
-          Final answer
+          Respond to user
         </label>
         <input
           id="answer-input"
           className="composer-input"
           value={answer}
           onChange={(e) => setAnswer(e.target.value)}
-          placeholder="your answer to the user"
+          placeholder="write your response"
         />
         <button
           className="action-button"
           onClick={() => dispatch({ type: ActionType.ANSWER, text: answer })}
         >
-          Submit answer
+          Send response
         </button>
       </div>
     </div>

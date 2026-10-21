@@ -8,9 +8,21 @@ export interface Scenario {
   contextLimit: number;
   files: Record<string, { content: string; tokens: number }>;
   answerKeywords: string[];
+  answerResponses: {
+    correct: string;
+    incorrect: string;
+  };
+  hints: string[];
   tools: string[];
 }
-export type Role = "system" | "user" | "you" | "result";
+export const ROLE = {
+  SYSTEM: "system",
+  USER: "user",
+  AGENT: "agent",
+  RESULT: "result",
+} as const;
+
+export type Role = (typeof ROLE)[keyof typeof ROLE];
 
 export interface Entry {
   role: Role;

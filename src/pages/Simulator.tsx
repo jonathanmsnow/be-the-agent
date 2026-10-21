@@ -2,52 +2,36 @@ import { useReducer, useState, useRef, useEffect } from "react";
 import { LogEntry } from "../components/LogEntry";
 import { ContextIndicator } from "../components/ContextTracker";
 import { ToolView } from "../components/ToolView";
-import {
-  ActionType,
-  type Entry,
-  type Scenario,
-  type ToolCall,
-} from "../engine/types";
+import { ROLE, type Scenario } from "../engine/types";
 import {
   TOOL_REGISTRY,
   prettyPrintToolRegistry as formattedToolRegistry,
 } from "../tools/toolRegistry";
 import { calculateTokens } from "../utils";
-import { reducer } from "./reducer";
-
-export interface State {
-  log: Entry[];
-  verdict: string | null;
-}
-
-export type Action = {
-  type: ActionType;
-  call?: ToolCall;
-  text?: string;
-};
+import { reducer, type Action, type State } from "./reducer";
 
 const initial: State = {
-  verdict: null,
   log: [],
+  hintIndex: 0,
 };
 
 function createInitialState(scenarioData: Scenario): State {
   const tools = formattedToolRegistry();
   return {
-    verdict: null,
+    hintIndex: 0,
     log: [
       {
-        role: "system",
+        role: ROLE.SYSTEM,
         text: scenarioData.system,
         tokens: calculateTokens(scenarioData.system),
       },
       {
-        role: "system",
+        role: ROLE.SYSTEM,
         text: `Tools: ${tools}`,
         tokens: calculateTokens(tools),
       },
       {
-        role: "user",
+        role: ROLE.USER,
         text: `${scenarioData.briefing.from}: ${scenarioData.briefing.message}`,
         tokens: calculateTokens(scenarioData.briefing.message),
       },
@@ -158,11 +142,6 @@ export function Simulator({
           {state.log.map((e, i) => (
             <LogEntry key={i} entry={e} />
           ))}
-          {state.verdict && (
-            <p>
-              <b>{state.verdict}</b>
-            </p>
-          )}
           <div ref={bottomRef} />
         </div>
       </main>

@@ -13,5 +13,13 @@
     "config.json": { "content": "{ \"port\": 8080 }", "tokens": 300 }
   },
   "tools": ["read_file", "list_files"],
-  "answerKeywords": ["8080"]
+  "answerKeywords": ["8080"],
+  "answerResponses": {
+    "correct": "Great, that was the right port!",
+    "incorrect": "No, that's not the right port."
+  },
+  "hints": [
+    "You should inspect the files available through the tools.",
+    "I think it is set in the config.json file."
+  ]
 }
