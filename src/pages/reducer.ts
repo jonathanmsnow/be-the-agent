@@ -11,6 +11,7 @@ import { calculateTokens } from "../utils";
 export interface State {
   log: Entry[];
   hintIndex: number;
+  answerStepIndex: number;
 }
 
 export type Action = {
@@ -37,6 +38,20 @@ export function reducer(
         action.call?.tool,
         action.call?.args,
       );
+      const path =
+        typeof action.call?.args === "object" &&
+        action.call.args !== null &&
+        "path" in action.call.args &&
+        typeof action.call.args.path === "string"
+          ? action.call.args.path
+          : undefined;
+      const interruption = path
+        ? Object.entries(scenarioData.toolInterrupts ?? {}).find(
+            ([blockedPath]) =>
+              path === blockedPath ||
+              path.endsWith(`/${blockedPath}`),
+          )?.[1]
+        : undefined;
       return {
         ...state,
         log: [
@@ -47,13 +62,27 @@ export function reducer(
             tokens: calculateTokens(callText),
           },
           { role: ROLE.RESULT, text: output, tokens: cost },
+          ...(interruption
+            ? [
+                {
+                  role: ROLE.USER,
+                  text: interruption,
+                  tokens: calculateTokens(interruption),
+                },
+              ]
+            : []),
         ],
       };
     }
     case ActionType.ANSWER: {
-      const ok = scenarioData.answerKeywords.every((k) =>
+      const step = scenarioData.answerSteps?.[state.answerStepIndex];
+      const keywords = step?.keywords ?? scenarioData.answerKeywords;
+      const ok = keywords.every((k) =>
         action.text?.includes(k),
       );
+      const response = ok
+        ? (step?.response ?? scenarioData.answerResponses.correct)
+        : scenarioData.answerResponses.incorrect;
       return {
         ...state,
         log: [
@@ -65,14 +94,8 @@ export function reducer(
           },
           {
             role: ROLE.USER,
-            text: ok
-              ? scenarioData.answerResponses.correct
-              : scenarioData.answerResponses.incorrect,
-            tokens: calculateTokens(
-              ok
-                ? scenarioData.answerResponses.correct
-                : scenarioData.answerResponses.incorrect,
-            ),
+            text: response,
+            tokens: calculateTokens(response),
           },
           ...(!ok && scenarioData.hints[state.hintIndex]
             ? [
@@ -85,6 +108,26 @@ export function reducer(
             : []),
         ],
         hintIndex: ok ? state.hintIndex : state.hintIndex + 1,
+        answerStepIndex:
+          ok && step
+            ? Math.min(state.answerStepIndex + 1, scenarioData.answerSteps!.length - 1)
+            : state.answerStepIndex,
+      };
+    }
+    case ActionType.SUMMARY: {
+      const summary = action.text?.trim() || "";
+      if (!summary) return state;
+
+      return {
+        ...state,
+        log: [
+          ...state.log.filter((entry) => entry.role === ROLE.SYSTEM),
+          {
+            role: ROLE.SYSTEM,
+            text: summary,
+            tokens: calculateTokens(summary),
+          },
+        ],
       };
     }
   }

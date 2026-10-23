@@ -23,7 +23,6 @@ export const readFile = defineTool({
       .describe("Optional view range to limit the content returned"),
   }),
   run(level, { path }) {
-    // path is typed as string
     const f = level.files[path];
     return f ? f.content : `Error: ${path} not found`;
   },

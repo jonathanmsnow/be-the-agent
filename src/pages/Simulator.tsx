@@ -2,6 +2,7 @@ import { useReducer, useState, useRef, useEffect } from "react";
 import { LogEntry } from "../components/LogEntry";
 import { ContextIndicator } from "../components/ContextTracker";
 import { ToolView } from "../components/ToolView";
+import { SummaryPrompt } from "../components/SummaryPrompt";
 import { ROLE, type Scenario } from "../engine/types";
 import {
   TOOL_REGISTRY,
@@ -13,12 +14,14 @@ import { reducer, type Action, type State } from "./reducer";
 const initial: State = {
   log: [],
   hintIndex: 0,
+  answerStepIndex: 0,
 };
 
 function createInitialState(scenarioData: Scenario): State {
   const tools = formattedToolRegistry();
   return {
     hintIndex: 0,
+    answerStepIndex: 0,
     log: [
       {
         role: ROLE.SYSTEM,
@@ -57,8 +60,12 @@ export function Simulator({
   const simulatorRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  const used: number = state.log.reduce((sum, e) => sum + e.tokens, 0);
+  const used: number = state.log.reduce(
+    (sum, e) => sum + (e.evicted ? 0 : e.tokens),
+    0,
+  );
   const pct: number = Math.min(100, (used / scenarioData.contextLimit) * 100);
+  const compactionRequired = pct >= 85;
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -80,7 +87,11 @@ export function Simulator({
     >
       <aside className="tools-pane">
         <header className="simulator-header">
-          <button className="back-button" onClick={onBack}>
+          <button
+            className="back-button"
+            disabled={compactionRequired}
+            onClick={onBack}
+          >
             ← All scenarios
           </button>
           <span className="simulator-label">Agent Tools</span>
@@ -91,6 +102,7 @@ export function Simulator({
             return tool ? [tool] : [];
           })}
           dispatch={dispatch}
+          disabled={compactionRequired}
         />
       </aside>
 
@@ -104,6 +116,7 @@ export function Simulator({
         aria-valuenow={toolsWidth}
         tabIndex={0}
         onPointerDown={(event) => {
+          if (compactionRequired) return;
           event.currentTarget.setPointerCapture(event.pointerId);
           resizeFromPointer(event.clientX);
         }}
@@ -118,6 +131,7 @@ export function Simulator({
           }
         }}
         onKeyDown={(event) => {
+          if (compactionRequired) return;
           if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
             event.preventDefault();
             const delta = event.key === "ArrowLeft" ? -2 : 2;
@@ -142,6 +156,7 @@ export function Simulator({
           {state.log.map((e, i) => (
             <LogEntry key={i} entry={e} />
           ))}
+          {compactionRequired && <SummaryPrompt dispatch={dispatch} />}
           <div ref={bottomRef} />
         </div>
       </main>

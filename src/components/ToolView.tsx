@@ -19,9 +19,11 @@ function requestTemplate(toolName: string) {
 export function ToolView({
   tools,
   dispatch,
+  disabled = false,
 }: {
   tools: ToolDef[];
   dispatch: Dispatch<ToolAction>;
+  disabled?: boolean;
 }) {
   const [selectedTool, setSelectedTool] = useState(tools[0]?.name || "");
   const [rawRequest, setRawRequest] = useState(() =>
@@ -36,6 +38,7 @@ export function ToolView({
         {tools.map((tool) => {
           return (
             <button
+              disabled={disabled}
               className={`tool-item${selectedTool === tool.name ? " selected" : ""}`}
               key={tool.name}
               role="option"
@@ -65,6 +68,7 @@ export function ToolView({
           Request body · JSON
         </label>
         <textarea
+          disabled={disabled}
           id="raw-tool-request"
           className="request-editor"
           value={rawRequest}
@@ -81,6 +85,7 @@ export function ToolView({
           </p>
         )}
         <button
+          disabled={disabled}
           className="action-button send-button"
           onClick={() => {
             try {
@@ -119,6 +124,7 @@ export function ToolView({
           Respond to user
         </label>
         <input
+          disabled={disabled}
           id="answer-input"
           className="composer-input"
           value={answer}
@@ -126,6 +132,7 @@ export function ToolView({
           placeholder="write your response"
         />
         <button
+          disabled={disabled}
           className="action-button"
           onClick={() => dispatch({ type: ActionType.ANSWER, text: answer })}
         >

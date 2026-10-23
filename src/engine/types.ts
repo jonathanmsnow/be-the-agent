@@ -12,6 +12,11 @@ export interface Scenario {
     correct: string;
     incorrect: string;
   };
+  answerSteps?: {
+    keywords: string[];
+    response: string;
+  }[];
+  toolInterrupts?: Record<string, string>;
   hints: string[];
   tools: string[];
 }
@@ -39,6 +44,7 @@ export interface ToolCall {
 export const ActionType = {
   RUN: "RUN",
   ANSWER: "ANSWER",
+  SUMMARY: "SUMMARY",
 } as const;
 
 export type ActionType = (typeof ActionType)[keyof typeof ActionType];

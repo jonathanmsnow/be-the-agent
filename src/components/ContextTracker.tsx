@@ -24,15 +24,16 @@ export function ContextIndicator({
   const [highlightedRole, setHighlightedRole] = useState<ResourceRole | null>(
     null,
   );
+  const activeEntries = entries.filter((entry) => !entry.evicted);
   const breakdown = (Object.keys(resourceLabels) as ResourceRole[]).map(
     (role) => ({
       role,
       label: resourceLabels[role],
-      tokens: entries
+      tokens: activeEntries
         .filter((entry) => entry.role === role)
         .reduce((sum, entry) => sum + entry.tokens, 0),
       percent:
-        (entries
+        (activeEntries
           .filter((entry) => entry.role === role)
           .reduce((sum, entry) => sum + entry.tokens, 0) /
           scenarioData.contextLimit) *
@@ -50,14 +51,14 @@ export function ContextIndicator({
       </div>
 
       <div
-        className={`context-meter-track ${pct > 85 ? "danger" : ""}`}
+        className={`context-meter-track ${pct >= 85 ? "danger" : ""}`}
         role="progressbar"
         aria-label="Context usage"
         aria-valuemin={0}
         aria-valuemax={scenarioData.contextLimit}
         aria-valuenow={used}
       >
-        {entries.map((entry, index) => (
+        {activeEntries.map((entry, index) => (
           <div
             className={`context-meter-segment ${entry.role} ${
               highlightedRole === entry.role ? "highlighted" : ""
