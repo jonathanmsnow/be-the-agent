@@ -1,4 +1,5 @@
 import type { Scenario } from "../engine/types";
+import { Card } from "./Card";
 
 export interface ScenarioCard {
   scenario: Scenario;
@@ -12,11 +13,14 @@ export interface ScenarioCard {
  */
 export function ScenarioCard({ scenario, onAction }: ScenarioCard) {
   return (
-    <article className="scenario-card" key={scenario.id}>
-      <div className="scenario-icon" aria-hidden="true">
-        ✦
-      </div>
-      <div className="scenario-card-content">
+    <Card
+      className="scenario-card"
+      icon="✦"
+      title={scenario.title}
+      description={scenario.description}
+      interactive
+      onClick={() => onAction(scenario)}
+      eyebrow={
         <div className="scenario-difficulty" aria-label={`Level ${scenario.difficulty} of 4`}>
           <span>Level {scenario.difficulty}</span>
           <span className="scenario-difficulty-separator" aria-hidden="true">
@@ -24,12 +28,17 @@ export function ScenarioCard({ scenario, onAction }: ScenarioCard) {
           </span>
           <span>4</span>
         </div>
-        <h3>{scenario.title}</h3>
-        <p>{scenario.description}</p>
-        <button className="start-button" onClick={() => onAction(scenario)}>
-          Open simulator <span>→</span>
-        </button>
-      </div>
-    </article>
+      }
+    >
+      <button
+        className="start-button"
+        onClick={(event) => {
+          event.stopPropagation();
+          onAction(scenario);
+        }}
+      >
+        Open simulator <span>→</span>
+      </button>
+    </Card>
   );
 }

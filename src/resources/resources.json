@@ -1,0 +1,107 @@
+{
+  "agent-concepts": {
+    "title": "Agent Concepts",
+    "topics": [
+      {
+        "title": "What is an agent?",
+        "description": "AI systems that can act autonomously to achieve goals, often using tools and reasoning.",
+        "resources": [
+          {
+            "title": "What is Agentic AI? (Stanford HAI)",
+            "description": "Learn about the definition and characteristics of agentic AI.",
+            "links": [
+              {
+                "label": "Read (2 min)",
+                "href": "https://hai.stanford.edu/ai-definitions/what-is-agentic-ai"
+              }
+            ]
+          },
+          {
+            "title": "What are the key components of an AI agent? (n8n)",
+            "description": "Explore the essential elements that make up an AI agent, including a walk through of a simple diagram.",
+            "links": [
+              {
+                "label": "Read (5 min)",
+                "href": "https://blog.n8n.io/ai-agents/#what-are-the-key-components-of-an-ai-agent"
+              }
+            ]
+          },
+          {
+            "title": "What is agentic coding? (IBM)",
+            "description": "Learn about the concept of agents and how they can be used to solve software problems.",
+            "links": [
+              {
+                "label": "Read (10 min)",
+                "href": "https://www.ibm.com/think/topics/agentic-coding"
+              },
+              {
+                "label": "Watch (10 min)",
+                "href": "https://www.youtube.com/watch?v=PjrXaC5UsIw"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Tool Calling",
+        "description": "Agents can use tools to interact with their environment and other systems, enabling them to perform complex tasks.",
+        "resources": [
+          {
+            "title": "What is tool calling? (IBM)",
+            "description": "Learn how agents use tools to interact with their environment and other systems.",
+            "links": [
+              {
+                "label": "Read (10 min)",
+                "href": "https://www.ibm.com/think/topics/tool-calling"
+              },
+              {
+                "label": "Watch (5 min)",
+                "href": "https://www.youtube.com/watch?v=h8gMhXYAv1k"
+              }
+            ]
+          },
+          {
+            "title": "Tool Calling in Practice (Practical AI)",
+            "description": "See how tool calling is used in real-world applications.",
+            "links": [
+              {
+                "label": "Listen (45 min)",
+                "href": "https://practicalai.show/303"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "title": "Context Management",
+        "description": "Learn how agents manage and utilize context to make informed decisions.",
+        "resources": [
+          {
+            "title": "Context Window (Stanford HAI)",
+            "description": "Understand the core definition of a context window.",
+            "links": [
+              {
+                "label": "Read (1 min)",
+                "href": "https://hai.stanford.edu/ai-definitions/what-is-a-context-window"
+              }
+            ]
+          },
+          {
+            "title": "What is a context window? (IBM)",
+            "description": "Understand what a context window is and why it's important in AI.",
+            "links": [
+              {
+                "label": "Read (10 min)",
+                "href": "https://www.ibm.com/think/topics/context-window"
+              },
+              {
+                "label": "Watch (10 min)",
+                "href": "https://www.youtube.com/watch?v=-QVoIxEpFkM"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
