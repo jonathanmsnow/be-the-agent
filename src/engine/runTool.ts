@@ -9,11 +9,13 @@ export function runTool(
   rawArgs: unknown,
 ): ToolResult {
   if (!name) {
-    return { output: "Error: no tool specified", cost: 15 };
+    const output = "Error: no tool specified";
+    return { output, cost: calculateTokens(output) };
   }
   const tool = TOOL_REGISTRY[name];
   if (!tool || !level.tools.includes(name)) {
-    return { output: `Error: no such tool "${name}"`, cost: 15 };
+    const output = `Error: no such tool "${name}"`;
+    return { output, cost: calculateTokens(output) };
   }
   let args = rawArgs;
   if (typeof rawArgs === "string") {

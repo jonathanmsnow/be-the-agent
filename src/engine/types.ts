@@ -3,10 +3,11 @@ export interface Scenario {
   id: string;
   title: string;
   description: string;
+  difficulty: 1 | 2 | 3 | 4;
   system: string;
   briefing: { from: string; message: string };
   contextLimit: number;
-  files: Record<string, { content: string; tokens: number }>;
+  files: Record<string, { content: string }>;
   answerKeywords: string[];
   answerResponses: {
     correct: string;

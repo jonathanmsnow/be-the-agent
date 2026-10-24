@@ -19,11 +19,22 @@ export const readFile = defineTool({
           .nonnegative()
           .describe("End index of the view range"),
       })
+      .refine(({ start, end }) => end > start, {
+        message: "End index must be greater than start index",
+        path: ["end"],
+      })
       .optional()
       .describe("Optional view range to limit the content returned"),
   }),
-  run(level, { path }) {
+  run(level, { path, view_range }) {
     const f = level.files[path];
-    return f ? f.content : `Error: ${path} not found`;
+    if (!f) {
+      return `Error: ${path} not found`;
+    }
+    if (view_range) {
+      const { start, end } = view_range;
+      return f.content.slice(start, end);
+    }
+    return f.content;
   },
 });

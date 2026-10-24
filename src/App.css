@@ -159,6 +159,25 @@
     font-size: 20px;
   }
 
+.scenario-difficulty {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 6px;
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+  }
+
+.scenario-difficulty-separator {
+    color: var(--text);
+    font-weight: 400;
+    line-height: 1;
+  }
+
 .scenario-card p {
     color: var(--text);
     font-size: 14px;
