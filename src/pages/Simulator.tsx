@@ -45,9 +45,11 @@ function createInitialState(scenarioData: Scenario): State {
 export function Simulator({
   scenarioData,
   onBack,
+  onRestart,
 }: {
   scenarioData: Scenario;
   onBack: () => void;
+  onRestart: () => void;
 }) {
   const [state, dispatch] = useReducer(
     (currentState: State, action: Action) =>
@@ -87,13 +89,29 @@ export function Simulator({
     >
       <aside className="tools-pane">
         <header className="simulator-header">
-          <button
-            className="back-button"
-            disabled={compactionRequired}
-            onClick={onBack}
-          >
-            ← All scenarios
-          </button>
+          <div className="simulator-header-actions">
+            <button
+              className="back-button"
+              disabled={compactionRequired}
+              onClick={onBack}
+            >
+              ← All scenarios
+            </button>
+            <button
+              className="back-button restart-button"
+              onClick={() => {
+                if (
+                  window.confirm(
+                    "Restart this scenario? Current progress will be lost.",
+                  )
+                ) {
+                  onRestart();
+                }
+              }}
+            >
+              Restart scenario
+            </button>
+          </div>
           <span className="simulator-label">Agent Tools</span>
         </header>
         <ToolView

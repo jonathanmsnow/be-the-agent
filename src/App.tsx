@@ -7,12 +7,15 @@ export default function App() {
   const [selectedScenario, setSelectedScenario] = useState<Scenario | null>(
     null,
   );
+  const [scenarioKey, setScenarioKey] = useState(0);
 
   if (selectedScenario) {
     return (
       <Simulator
+        key={scenarioKey}
         scenarioData={selectedScenario}
         onBack={() => setSelectedScenario(null)}
+        onRestart={() => setScenarioKey((key) => key + 1)}
       />
     );
   }

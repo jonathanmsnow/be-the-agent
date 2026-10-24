@@ -270,9 +270,20 @@
     padding: 18px 0 12px;
   }
 
+.simulator-header-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
 .back-button {
     padding: 7px 10px;
     font-size: 12px;
+  }
+
+.restart-button {
+    color: var(--error);
+    border-color: color-mix(in srgb, var(--error) 50%, transparent);
   }
 
 .simulator-label {
@@ -480,6 +491,82 @@
     margin-bottom: 6px;
   }
 
+.request-mode-toggle {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+.mode-button {
+    margin-bottom: -1px;
+    padding: 4px 8px 6px;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    color: var(--text);
+    background: transparent;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+  }
+
+.mode-button.selected {
+    border-bottom-color: var(--accent);
+    color: var(--text-h);
+  }
+
+.request-form {
+    display: grid;
+    gap: 10px;
+    min-height: 145px;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    background: var(--code-bg);
+  }
+
+.form-field {
+    display: grid;
+    grid-template-columns: minmax(80px, 1fr) minmax(0, 2fr);
+    align-items: center;
+    gap: 8px;
+    color: var(--text-h);
+    font: 11px/1.4 var(--mono);
+  }
+
+.form-field small {
+    color: var(--text);
+    font-size: 10px;
+  }
+
+.form-field input:not([type="checkbox"]) {
+    box-sizing: border-box;
+    min-width: 0;
+    width: 100%;
+    padding: 5px 6px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-h);
+    background: var(--bg);
+    font: inherit;
+  }
+
+.form-fieldset {
+    display: grid;
+    grid-column: 1 / -1;
+    gap: 8px;
+    margin: 0;
+    padding: 8px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+  }
+
+.form-fieldset legend {
+    padding: 0 4px;
+    color: var(--text);
+    font: 11px var(--mono);
+  }
+
 .request-editor {
     display: block;
     width: 100%;
@@ -491,7 +578,7 @@
     padding: 9px;
     color: var(--text-h);
     background: var(--code-bg);
-    font: 12px/1.5 var(--mono);
+    font: 11px/1.5 var(--mono);
   }
 
 .request-editor:focus,
