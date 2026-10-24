@@ -7,8 +7,6 @@ export interface CardProps {
   eyebrow?: ReactNode;
   children?: ReactNode;
   className?: string;
-  interactive?: boolean;
-  onClick?: () => void;
 }
 
 export function Card({
@@ -18,30 +16,10 @@ export function Card({
   eyebrow,
   children,
   className = "",
-  interactive = false,
-  onClick,
 }: CardProps) {
   return (
-    // Interactive cards retain article semantics so they can contain their action button.
-    // eslint-disable-next-line jsx-a11y-x/no-noninteractive-element-interactions
     <article
-      className={`card ${interactive ? "card--interactive" : ""} ${className}`.trim()}
-      onClick={onClick}
-      onKeyDown={(event) => {
-        if (
-          event.target !== event.currentTarget ||
-          !interactive ||
-          !onClick ||
-          (event.key !== "Enter" && event.key !== " ")
-        ) {
-          return;
-        }
-
-        event.preventDefault();
-        onClick();
-      }}
-      role={interactive && onClick ? "button" : undefined}
-      tabIndex={interactive && onClick ? 0 : undefined}
+      className={`card ${className}`.trim()}
     >
       <div className="card-icon" aria-hidden="true">
         {icon}

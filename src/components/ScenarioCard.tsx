@@ -14,12 +14,10 @@ export interface ScenarioCard {
 export function ScenarioCard({ scenario, onAction }: ScenarioCard) {
   return (
     <Card
-      className="scenario-card"
+      className="scenario-card card--interactive"
       icon="✦"
       title={scenario.title}
       description={scenario.description}
-      interactive
-      onClick={() => onAction(scenario)}
       eyebrow={
         <div className="scenario-difficulty" aria-label={`Level ${scenario.difficulty} of 4`}>
           <span>Level {scenario.difficulty}</span>

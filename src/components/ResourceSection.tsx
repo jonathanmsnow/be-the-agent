@@ -18,14 +18,14 @@ interface ResourceTopic {
 }
 
 export interface ResourceSectionData {
-  title: string;
+  title?: string;
   topics: ResourceTopic[];
 }
 
 export function ResourceSection({ section }: { section: ResourceSectionData }) {
   return (
     <section className="resource-section">
-      <h2>{section.title}</h2>
+      {section.title && <h2>{section.title}</h2>}
       {section.topics.map((topic) => (
         <div className="resource-topic" key={topic.title}>
           <h3>{topic.title}</h3>

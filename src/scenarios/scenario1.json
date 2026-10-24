@@ -17,7 +17,7 @@
   "answerKeywords": ["8080"],
   "answerResponses": {
     "correct": "Great, that was the right port!",
-    "incorrect": "No, that's not the right port."
+    "incorrect": "No, that didn't seem to be the right port."
   },
   "hints": [
     "You should inspect the files available through the tools.",

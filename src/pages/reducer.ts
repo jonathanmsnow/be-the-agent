@@ -12,6 +12,7 @@ export interface State {
   log: Entry[];
   hintIndex: number;
   answerStepIndex: number;
+  completed: boolean;
 }
 
 export type Action = {
@@ -111,6 +112,11 @@ export function reducer(
           ok && step
             ? Math.min(state.answerStepIndex + 1, scenarioData.answerSteps!.length - 1)
             : state.answerStepIndex,
+        completed:
+          state.completed ||
+          (ok &&
+            (!scenarioData.answerSteps ||
+              state.answerStepIndex === scenarioData.answerSteps.length - 1)),
       };
     }
     case ActionType.SUMMARY: {

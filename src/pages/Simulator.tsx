@@ -15,6 +15,7 @@ const initial: State = {
   log: [],
   hintIndex: 0,
   answerStepIndex: 0,
+  completed: false,
 };
 
 function createInitialState(scenarioData: Scenario): State {
@@ -22,6 +23,7 @@ function createInitialState(scenarioData: Scenario): State {
   return {
     hintIndex: 0,
     answerStepIndex: 0,
+    completed: false,
     log: [
       {
         role: ROLE.SYSTEM,
@@ -59,6 +61,7 @@ export function Simulator({
   );
 
   const [toolsWidth, setToolsWidth] = useState(38);
+  const [completionDismissed, setCompletionDismissed] = useState(false);
   const simulatorRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -82,13 +85,14 @@ export function Simulator({
 
   /* eslint-disable jsx-a11y-x/no-noninteractive-element-interactions, jsx-a11y-x/no-noninteractive-tabindex */
   return (
-    <div
+    <main
       ref={simulatorRef}
       className="simulator"
       style={{ gridTemplateColumns: `${toolsWidth}% 8px 1fr` }}
     >
       <aside className="tools-pane">
-        <header className="simulator-header">
+        <h1 className="sr-only">Agent simulator</h1>
+        <div className="simulator-header">
           <div className="simulator-header-actions">
             <button
               className="back-button"
@@ -113,7 +117,7 @@ export function Simulator({
             </button>
           </div>
           <span className="simulator-label">Agent Tools</span>
-        </header>
+        </div>
         <ToolView
           tools={scenarioData.tools.flatMap((name) => {
             const tool = TOOL_REGISTRY[name];
@@ -157,11 +161,11 @@ export function Simulator({
           }
         }}
       />
-      <main className="chat-pane">
+      <div className="chat-pane" role="region" aria-label="Live simulator">
         <div className="simulator-sticky">
-          <header className="simulator-header">
+          <div className="simulator-header">
             <span className="simulator-label">LIVE SIMULATOR</span>
-          </header>
+          </div>
           <ContextIndicator
             used={used}
             scenarioData={scenarioData}
@@ -177,8 +181,30 @@ export function Simulator({
           {compactionRequired && <SummaryPrompt dispatch={dispatch} />}
           <div ref={bottomRef} />
         </div>
-      </main>
-    </div>
+      </div>
+      {state.completed && !completionDismissed && (
+        <div className="completion-backdrop">
+          <section
+            className="completion-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="completion-title"
+          >
+            <h2 id="completion-title">Scenario complete</h2>
+            <p>
+              You answered all questions correctly. You can continue to
+              interact with the environment if you wish.
+            </p>
+            <button
+              className="action-button"
+              onClick={() => setCompletionDismissed(true)}
+            >
+              Continue exploring
+            </button>
+          </section>
+        </div>
+      )}
+    </main>
   );
   /* eslint-enable jsx-a11y-x/no-noninteractive-element-interactions, jsx-a11y-x/no-noninteractive-tabindex */
 }

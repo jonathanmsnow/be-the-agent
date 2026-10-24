@@ -20,7 +20,10 @@ export function LandingPage({
           finding the answer before your context window runs out.
         </p>
       </section>
-      <section className="intro-section" aria-label="About Be the Agent">
+      <section className="intro-section" aria-labelledby="how-it-works">
+        <h2 id="how-it-works" className="sr-only">
+          How it works
+        </h2>
         <div className="intro-grid">
           <Card
             icon="◎"
@@ -39,11 +42,11 @@ export function LandingPage({
           />
         </div>
       </section>
-      <section className="scenario-section">
+      <section className="scenario-section" aria-labelledby="missions-heading">
         <div className="section-heading">
           <div>
             <div className="eyebrow">CHOOSE YOUR MISSION</div>
-            <h2>Available scenarios</h2>
+            <h2 id="missions-heading">Available scenarios</h2>
           </div>
           <span className="scenario-count">
             {scenarios.length} scenario{scenarios.length === 1 ? "" : "s"}
@@ -61,11 +64,11 @@ export function LandingPage({
           ))}
         </div>
       </section>
-      <section className="hero">
+      <section className="hero" aria-labelledby="resources-heading">
         <div className="section-heading">
           <div>
             <div className="eyebrow">NEED SOME BACKGROUND?</div>
-            <h1>Resources</h1>
+            <h2 id="resources-heading">Resources</h2>
           </div>
         </div>
         {Object.entries(resources).map(([sectionId, section]) => (

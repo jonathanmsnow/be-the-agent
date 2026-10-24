@@ -1,6 +1,5 @@
 {
   "agent-concepts": {
-    "title": "Agent Concepts",
     "topics": [
       {
         "title": "What is an agent?",
@@ -97,6 +96,16 @@
               {
                 "label": "Watch (10 min)",
                 "href": "https://www.youtube.com/watch?v=-QVoIxEpFkM"
+              }
+            ]
+          },
+          {
+            "title": "Context Window Compaction (GitHub Copilot)",
+            "description": "Learn how GitHub Copilot manages context windows to improve performance.",
+            "links": [
+              {
+                "label": "Read (5 min)",
+                "href": "https://docs.github.com/en/copilot/concepts/prompting-and-context/context-management#compaction"
               }
             ]
           }
