@@ -3,6 +3,7 @@
   "title": "Release Readiness Handoff",
   "difficulty": 3,
   "description": "Investigate a realistic release handoff as the context window fills, then practice preserving useful working state through compaction.",
+  "contextTracking": true,
   "system": "You are a helpful coding assistant. You have access to tools and the current working directory. You can read files and list files in the repository. You are not allowed to read .env files because they may contain secrets.",
   "briefing": {
     "from": "Maya",

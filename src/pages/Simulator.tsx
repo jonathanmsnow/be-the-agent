@@ -69,8 +69,15 @@ export function Simulator({
     (sum, e) => sum + (e.evicted ? 0 : e.tokens),
     0,
   );
-  const pct: number = Math.min(100, (used / scenarioData.contextLimit) * 100);
-  const compactionRequired = pct >= 85;
+  const contextTrackingEnabled =
+    scenarioData.contextTracking !== false &&
+    typeof scenarioData.contextLimit === "number" &&
+    scenarioData.contextLimit > 0;
+  const contextLimit = scenarioData.contextLimit ?? 0;
+  const pct: number = contextTrackingEnabled
+    ? Math.min(100, (used / contextLimit) * 100)
+    : 0;
+  const compactionRequired = contextTrackingEnabled && pct >= 85;
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -166,12 +173,14 @@ export function Simulator({
           <div className="simulator-header">
             <span className="simulator-label">LIVE SIMULATOR</span>
           </div>
-          <ContextIndicator
-            used={used}
-            scenarioData={scenarioData}
-            pct={pct}
-            entries={state.log}
-          />
+          {contextTrackingEnabled && (
+            <ContextIndicator
+              used={used}
+              contextLimit={contextLimit}
+              pct={pct}
+              entries={state.log}
+            />
+          )}
         </div>
 
         <div className="log">

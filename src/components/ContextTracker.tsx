@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ROLE, type Entry, type Scenario } from "../engine/types";
+import { ROLE, type Entry } from "../engine/types";
 
 const resourceLabels = {
   [ROLE.RESULT]: "Tools",
@@ -12,12 +12,12 @@ type ResourceRole = keyof typeof resourceLabels;
 
 export function ContextIndicator({
   used,
-  scenarioData,
+  contextLimit,
   pct,
   entries,
 }: {
   used: number;
-  scenarioData: Scenario;
+  contextLimit: number;
   pct: number;
   entries: Entry[];
 }) {
@@ -36,7 +36,7 @@ export function ContextIndicator({
         (activeEntries
           .filter((entry) => entry.role === role)
           .reduce((sum, entry) => sum + entry.tokens, 0) /
-          scenarioData.contextLimit) *
+          contextLimit) *
         100,
     }),
   );
@@ -46,7 +46,7 @@ export function ContextIndicator({
       <div className="context-meter-label">
         <b>CONTEXT</b>
         <span>
-          {used} / {scenarioData.contextLimit} tokens
+          {used} / {contextLimit} tokens
         </span>
       </div>
 
@@ -55,7 +55,7 @@ export function ContextIndicator({
         role="progressbar"
         aria-label="Context usage"
         aria-valuemin={0}
-        aria-valuemax={scenarioData.contextLimit}
+        aria-valuemax={contextLimit}
         aria-valuenow={used}
       >
         {activeEntries.map((entry, index) => (
@@ -68,7 +68,7 @@ export function ContextIndicator({
             onMouseEnter={() => setHighlightedRole(entry.role)}
             onMouseLeave={() => setHighlightedRole(null)}
             style={{
-              flexBasis: `${(entry.tokens / scenarioData.contextLimit) * 100}%`,
+              flexBasis: `${(entry.tokens / contextLimit) * 100}%`,
             }}
           />
         ))}

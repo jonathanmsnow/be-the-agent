@@ -6,7 +6,8 @@ export interface Scenario {
   difficulty: 1 | 2 | 3 | 4;
   system: string;
   briefing: { from: string; message: string };
-  contextLimit: number;
+  contextTracking?: boolean;
+  contextLimit?: number;
   files: Record<string, { content: string }>;
   answerKeywords: string[];
   answerResponses: {

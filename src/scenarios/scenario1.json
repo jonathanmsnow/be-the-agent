@@ -3,12 +3,12 @@
   "title": "Server Port Inquiry",
   "difficulty": 1,
   "description": "Help the operations team identify the port number that the server is listening on by making tool calls.",
+  "contextTracking": false,
   "system": "You are a helpful assistant. Answer the user's question.",
   "briefing": {
     "from": "Dana",
     "message": "What port does the server listen on? I am trying to configure the firewall and need to know the port number."
   },
-  "contextLimit": 1000,
   "files": {
     "README.md": { "content": "Nothing useful here." },
     "config.json": { "content": "{ \"port\": 8080 }" }
