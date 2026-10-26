@@ -168,7 +168,12 @@ export function Simulator({
           }
         }}
       />
-      <div className="chat-pane" role="region" aria-label="Live simulator">
+      <div
+        className="chat-pane"
+        role="region"
+        aria-label="Live simulator"
+        tabIndex={0}
+      >
         <div className="simulator-sticky">
           <div className="simulator-header">
             <span className="simulator-label">LIVE SIMULATOR</span>
