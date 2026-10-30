@@ -1,13 +1,25 @@
 import type { Entry } from "../engine/types";
 
-export function LogEntry({ entry }: { entry: Entry }) {
+export function LogEntry({
+  entry,
+  showTokens = true,
+}: {
+  entry: Entry;
+  showTokens?: boolean;
+}) {
   return (
-    <div className={`entry ${entry.role}${entry.evicted ? " evicted" : ""}`}>
+    <div
+      className={`entry ${entry.role}${entry.evicted ? " evicted" : ""}${
+        showTokens ? "" : " no-tokens"
+      }`}
+    >
       <span className="role">[{entry.role}]</span>
       <span className="text">{entry.text}</span>
-      <span className="tokens">
-        {entry.evicted ? "compacted" : `+${entry.tokens} tokens`}
-      </span>
+      {showTokens && (
+        <span className="tokens">
+          {entry.evicted ? "compacted" : `+${entry.tokens} tokens`}
+        </span>
+      )}
     </div>
   );
 }

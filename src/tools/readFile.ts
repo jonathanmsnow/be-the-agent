@@ -5,7 +5,7 @@ export const readFile = defineTool({
   name: "read_file",
   description: "Return the contents of a file.",
   schema: z.object({
-    path: z.string().describe("Absolute path to the file, e.g. src/hello.txt"),
+    path: z.string().describe("Relative path to the file, e.g. src/hello.txt"),
     view_range: z
       .object({
         start: z

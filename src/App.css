@@ -39,6 +39,10 @@
     opacity: 0.45;
     text-decoration: line-through;
   }
+
+  &.no-tokens {
+    grid-template-columns: 70px 1fr;
+  }
 }
 
 #center {
@@ -645,7 +649,8 @@
     font: 11px/1.4 var(--mono);
   }
 
-.form-field small {
+.form-field small,
+.form-fieldset small {
     color: var(--text);
     font-size: 10px;
   }

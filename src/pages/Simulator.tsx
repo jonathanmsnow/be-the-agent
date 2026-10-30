@@ -190,7 +190,11 @@ export function Simulator({
 
         <div className="log">
           {state.log.map((e, i) => (
-            <LogEntry key={i} entry={e} />
+            <LogEntry
+              key={i}
+              entry={e}
+              showTokens={contextTrackingEnabled}
+            />
           ))}
           {compactionRequired && <SummaryPrompt dispatch={dispatch} />}
           <div ref={bottomRef} />

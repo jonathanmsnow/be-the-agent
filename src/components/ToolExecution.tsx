@@ -97,7 +97,10 @@ function FormField({
       typeof value === "object" && value ? (value as FormValues) : {};
     return (
       <fieldset className="form-fieldset">
-        <legend>{name}</legend>
+        <legend>
+          {name}
+          <small> ({required ? "required" : "optional"})</small>
+        </legend>
         {Object.entries(schema.properties).map(([childName, childSchema]) => (
           <FormField
             key={childName}
@@ -105,7 +108,9 @@ function FormField({
             schema={childSchema}
             value={objectValue[childName]}
             path={[...path, childName]}
-            required={(schema.required ?? []).includes(childName)}
+            required={
+              required && (schema.required ?? []).includes(childName)
+            }
             onChange={onChange}
           />
         ))}
@@ -120,12 +125,13 @@ function FormField({
     <label className="form-field" htmlFor={id}>
       <span>
         {name}
-        {!required && <small> optional</small>}
+        <small> ({required ? "required" : "optional"})</small>
       </span>
       {isBoolean ? (
         <input
           id={id}
           type="checkbox"
+          aria-required={required}
           checked={value === true}
           onChange={(event) => onChange(path, event.target.checked)}
         />
@@ -133,6 +139,7 @@ function FormField({
         <input
           id={id}
           type={isNumber ? "number" : "text"}
+          aria-required={required}
           value={value === undefined ? "" : String(value)}
           onChange={(event) => {
             const text = event.target.value;
