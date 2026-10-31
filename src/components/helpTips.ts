@@ -9,6 +9,10 @@ export type TipDefinition = {
   label: string;
   title: string;
   body: string;
+  learnMoreUrl?: string;
+  learnMoreLabel?: string;
+  hoverOnly?: boolean;
+  contextual?: boolean;
   targetId?: string;
   fallbackTargetId?: string;
   initialDelayMs?: number;
@@ -17,6 +21,29 @@ export type TipDefinition = {
 };
 
 export const TIP_DEFINITIONS: TipDefinition[] = [
+  {
+    id: "tools",
+    label: "Tools",
+    title: "Tools",
+    body: "Tools let an agent inspect context and take actions in the environment. Choose the tool that gathers the evidence or makes the change needed for the user's request.",
+    learnMoreUrl: "https://www.ibm.com/think/topics/tool-calling",
+    targetId: "tools-help",
+    hoverOnly: true,
+    contextual: true,
+    scenarioId: null,
+  },
+  {
+    id: "context-window",
+    label: "Context windows",
+    title: "Context Windows",
+    body: "A context window is the amount of information an agent can keep available while working. As it fills, older information may need to be compacted or removed.",
+    learnMoreUrl:
+      "https://docs.github.com/en/copilot/concepts/prompting-and-context/context-management",
+    hoverOnly: true,
+    contextual: true,
+    targetId: "context-window-help",
+    scenarioId: null,
+  },
   {
     id: "tool-call-prompt",
     label: "Call a tool",

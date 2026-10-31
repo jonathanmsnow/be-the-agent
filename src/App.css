@@ -370,9 +370,34 @@
   }
 
 .simulator-label {
+    display: inline-flex;
+    align-items: center;
     color: var(--text);
     font-size: 11px;
     letter-spacing: 1px;
+  }
+
+.help-tip-trigger {
+    display: inline-flex;
+    width: 18px;
+    height: 18px;
+    margin-left: 5px;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid var(--accent-border);
+    border-radius: 50%;
+    color: var(--text-h);
+    background: transparent;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: help;
+  }
+
+.help-tip-trigger span {
+    display: block;
+    line-height: 1;
   }
 
 .tips-button {
@@ -410,7 +435,7 @@
 .help-tip-arrow {
     position: absolute;
     top: -6px;
-    left: 18px;
+    left: var(--help-tip-arrow-left, 18px);
     width: 10px;
     height: 10px;
     border-top: 2px solid var(--accent-border);
@@ -446,6 +471,11 @@
 
 .help-tip-title {
     font-size: 15px;
+  }
+
+.help-tip-link {
+    color: var(--accent);
+    font-weight: 700;
   }
 
 .help-tip-stop {
@@ -676,6 +706,8 @@
   }
 
 .tool-section-label {
+    display: inline-flex;
+    align-items: center;
     margin-bottom: 8px;
   }
 
@@ -954,3 +986,4 @@ textarea:focus-visible,
   .log {
     padding-bottom: 16px;
   }
+}

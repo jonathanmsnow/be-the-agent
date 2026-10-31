@@ -7,7 +7,7 @@ import {
   useCallback,
 } from "react";
 import { LogEntry } from "../components/LogEntry";
-import { HelpTip } from "../components/HelpTip";
+import { HelpTip, HelpTipTrigger } from "../components/HelpTip";
 import { TipsMenu } from "../components/TipsMenu";
 import {
   isVisible,
@@ -88,6 +88,8 @@ export function Simulator({
     Array<{
       id: string;
       anchor: HTMLElement;
+      persistent: boolean;
+      hoverOnly: boolean;
     }>
   >([]);
   const [tipsAnchor, setTipsAnchor] = useState<HTMLElement | null>(null);
@@ -137,11 +139,20 @@ export function Simulator({
         return;
       }
       setTipsAnchor(null);
-      setActiveTips((current) =>
-        current.some((active) => active.id === tip.id)
-          ? current
-          : [...current, { id: tip.id, anchor }],
-      );
+      setActiveTips((current) => {
+        const existing = current.find((active) => active.id === tip.id);
+        if (existing) {
+          return force && !existing.persistent
+            ? current.map((active) =>
+                active.id === tip.id ? { ...active, persistent: true } : active,
+              )
+            : current;
+        }
+        return [
+          ...current,
+          { id: tip.id, anchor, persistent: force, hoverOnly: tip.hoverOnly ?? false },
+        ];
+      });
     },
     [activeTips, seenTips, scenarioTips],
   );
@@ -205,7 +216,15 @@ export function Simulator({
       setActiveTips((current) =>
         current.some((tip) => tip.id === "original-user-request")
           ? current
-          : [...current, { id: "original-user-request", anchor: request }],
+          : [
+              ...current,
+              {
+                id: "original-user-request",
+                anchor: request,
+                persistent: false,
+                hoverOnly: false,
+              },
+            ],
       );
     }, 100);
   };
@@ -250,7 +269,15 @@ export function Simulator({
       setActiveTips((current) =>
         current.some((tip) => tip.id === "original-user-request")
           ? current
-          : [...current, { id: "original-user-request", anchor: request }],
+          : [
+              ...current,
+              {
+                id: "original-user-request",
+                anchor: request,
+                persistent: false,
+                hoverOnly: false,
+              },
+            ],
       );
     }, delay);
     return () => window.clearTimeout(tipTimer);
@@ -309,7 +336,15 @@ export function Simulator({
             <button
               className="back-button"
               disabled={compactionRequired}
-              onClick={onBack}
+              onClick={() => {
+                if (
+                  window.confirm(
+                    "Leave this simulator? Current progress will be lost.",
+                  )
+                ) {
+                  onBack();
+                }
+              }}
             >
               ← All scenarios
             </button>
@@ -348,6 +383,9 @@ export function Simulator({
           })}
           dispatch={dispatch}
           disabled={compactionRequired}
+          onToolsHelp={(persistent) =>
+            openTip("tools", undefined, persistent)
+          }
           onViewRangeFocus={(anchor) => showTip("view-range", anchor)}
           onModeSwitch={(anchor) => showTip("request-mode", anchor)}
           onAnswerFocus={(anchor) => showTip("answer-required", anchor)}
@@ -401,7 +439,15 @@ export function Simulator({
       >
         <div className="simulator-sticky">
           <div className="simulator-header">
-            <span className="simulator-label">CONTEXT WINDOW</span>
+            <span className="simulator-label" id="context-window-heading">
+              CONTEXT WINDOW
+              <HelpTipTrigger
+                id="context-window-help"
+                label="Learn about context windows"
+                onHover={() => openTip("context-window", undefined)}
+                onClick={() => openTip("context-window", undefined, true)}
+              />
+            </span>
           </div>
           {contextTrackingEnabled && (
             <ContextIndicator
@@ -457,6 +503,11 @@ export function Simulator({
             anchor={activeTip.anchor}
             title={tip.title}
             body={tip.body}
+            learnMoreUrl={tip.learnMoreUrl}
+            learnMoreLabel={tip.learnMoreLabel}
+            persistent={activeTip.persistent}
+            hoverOnly={activeTip.hoverOnly}
+            contextual={tip.contextual}
             onClose={() =>
               setActiveTips((current) =>
                 current.filter((active) => active.id !== activeTip.id),

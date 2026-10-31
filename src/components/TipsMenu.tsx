@@ -48,7 +48,7 @@ export function TipsMenu({
     >
       <strong>Tips</strong>
       <ul>
-        {tips.map((tip) => (
+        {tips.filter((tip) => !tip.contextual).map((tip) => (
           <li key={tip.id}>
             <label className="tips-checkbox">
               <input

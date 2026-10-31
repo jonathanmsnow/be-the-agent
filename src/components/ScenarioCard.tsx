@@ -19,8 +19,11 @@ export function ScenarioCard({ scenario, onAction }: ScenarioCard) {
       title={scenario.title}
       description={scenario.description}
       eyebrow={
-        <div className="scenario-difficulty" aria-label={`Level ${scenario.difficulty} of 4`}>
-          <span>Level {scenario.difficulty}</span>
+        <div
+          className="scenario-difficulty"
+          aria-label={`Difficulty ${scenario.difficulty} of 4`}
+        >
+          <span>Difficulty {scenario.difficulty}</span>
           <span className="scenario-difficulty-separator" aria-hidden="true">
             /
           </span>

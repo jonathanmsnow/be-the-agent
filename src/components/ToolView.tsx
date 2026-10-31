@@ -3,6 +3,7 @@ import type { ToolDef } from "../engine/types";
 import { ToolExecution, type ToolAction } from "./ToolExecution";
 import { ToolList } from "./ToolList";
 import { requestTemplate } from "./requestTemplate";
+import { HelpTipTrigger } from "./HelpTip";
 
 export function ToolView({
   tools,
@@ -10,6 +11,7 @@ export function ToolView({
   disabled = false,
   onViewRangeFocus,
   onModeSwitch,
+  onToolsHelp,
   onToolRun,
   onAnswerFocus,
   onEmptyAnswer,
@@ -20,6 +22,7 @@ export function ToolView({
   disabled?: boolean;
   onViewRangeFocus?: (anchor: HTMLElement) => void;
   onModeSwitch?: (anchor: HTMLElement) => void;
+  onToolsHelp?: (persistent: boolean) => void;
   onToolRun?: () => void;
   onAnswerFocus?: (anchor: HTMLElement) => void;
   onEmptyAnswer?: (anchor: HTMLElement) => void;
@@ -37,7 +40,15 @@ export function ToolView({
 
   return (
     <div className="tool-client">
-      <div className="tool-section-label">TOOLS</div>
+      <div className="tool-section-label">
+        <span>TOOLS</span>
+        <HelpTipTrigger
+          id="tools-help"
+          label="Learn about tools"
+          onHover={() => onToolsHelp?.(false)}
+          onClick={() => onToolsHelp?.(true)}
+        />
+      </div>
       <ToolList
         tools={tools}
         selectedTool={selectedTool?.name ?? ""}
