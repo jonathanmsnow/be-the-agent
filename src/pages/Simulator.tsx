@@ -150,7 +150,12 @@ export function Simulator({
         }
         return [
           ...current,
-          { id: tip.id, anchor, persistent: force, hoverOnly: tip.hoverOnly ?? false },
+          {
+            id: tip.id,
+            anchor,
+            persistent: force,
+            hoverOnly: tip.hoverOnly ?? false,
+          },
         ];
       });
     },
@@ -346,7 +351,7 @@ export function Simulator({
                 }
               }}
             >
-              ← All scenarios
+              ← Back
             </button>
             <button
               className="back-button restart-button"
@@ -390,9 +395,7 @@ export function Simulator({
           })}
           dispatch={dispatch}
           disabled={compactionRequired}
-          onToolsHelp={(persistent) =>
-            openTip("tools", undefined, persistent)
-          }
+          onToolsHelp={(persistent) => openTip("tools", undefined, persistent)}
           onViewRangeFocus={(anchor) => showTip("view-range", anchor)}
           onModeSwitch={(anchor) => showTip("request-mode", anchor)}
           onAnswerFocus={(anchor) => showTip("answer-required", anchor)}
@@ -505,7 +508,9 @@ export function Simulator({
         </div>
       )}
       {activeTips.map((activeTip) => {
-        const tip = scenarioTips.find((candidate) => candidate.id === activeTip.id);
+        const tip = scenarioTips.find(
+          (candidate) => candidate.id === activeTip.id,
+        );
         if (!tip) return null;
         return (
           <HelpTip
@@ -535,9 +540,7 @@ export function Simulator({
           onShowTip={(tip) => {
             setTipsAnchor(null);
             const anchor: HTMLElement | null =
-              (tip.targetId
-                ? document.getElementById(tip.targetId)
-                : null) ||
+              (tip.targetId ? document.getElementById(tip.targetId) : null) ||
               (tip.fallbackTargetId
                 ? document.getElementById(tip.fallbackTargetId)
                 : null);

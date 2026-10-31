@@ -19,7 +19,7 @@ test("simulator has no detectable accessibility violations", async ({
 }) => {
   await page.goto("/");
   await page.getByRole("button", { name: /open simulator/i }).first().click();
-  await expect(page.getByRole("button", { name: /all scenarios/i })).toBeVisible();
+  await expect(page.getByRole("button", { name: /back/i })).toBeVisible();
 
   await expectNoAxeViolations(page);
 });
