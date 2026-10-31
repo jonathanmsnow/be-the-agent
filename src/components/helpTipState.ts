@@ -1,46 +1,20 @@
-import tipDefinitions from "./helpTips.json";
+import {
+  shouldTriggerTip,
+  tipForTarget,
+  tipsForScenario,
+  TIP_DEFINITIONS,
+  type TipDefinition,
+  type TipTriggerContext,
+} from "./helpTips";
 
-export type TipDefinition = {
-  id: string;
-  label: string;
-  title: string;
-  body: string;
-  targetId?: string;
-  fallbackTargetId?: string;
-  triggerId?: string;
-  scenarioId?: string | null;
+export {
+  shouldTriggerTip,
+  tipForTarget,
+  tipsForScenario,
+  TIP_DEFINITIONS,
+  type TipDefinition,
+  type TipTriggerContext,
 };
-
-export const TIP_DEFINITIONS = tipDefinitions as TipDefinition[];
-
-export function tipsForScenario(scenarioId: string) {
-  return TIP_DEFINITIONS.filter(
-    (tip) => !tip.scenarioId || tip.scenarioId === scenarioId,
-  );
-}
-
-export function tipForTarget(tips: TipDefinition[], targetId: string) {
-  return tips.find((tip) => tip.targetId === targetId || tip.id === targetId);
-}
-
-export type TipTriggerContext = {
-  elapsedMs: number;
-  toolRunCount: number;
-};
-
-type TipTrigger = (context: TipTriggerContext) => boolean;
-
-const TIP_TRIGGERS: Record<string, TipTrigger> = {
-  idleBeforeTool: ({ elapsedMs, toolRunCount }) =>
-    toolRunCount === 0 && elapsedMs >= 10_000,
-};
-
-export function shouldTriggerTip(
-  tip: TipDefinition,
-  context: TipTriggerContext,
-) {
-  return tip.triggerId ? TIP_TRIGGERS[tip.triggerId]?.(context) ?? false : false;
-}
 
 const STORAGE_KEY = "be-the-agent-seen-tips";
 let memorySeen = new Set<string>();

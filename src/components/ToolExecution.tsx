@@ -1,4 +1,4 @@
-import { useState, type Dispatch } from "react";
+import { useRef, useState, type Dispatch } from "react";
 import { z } from "zod";
 import { ActionType, type ToolCall, type ToolDef } from "../engine/types";
 
@@ -17,6 +17,7 @@ type JsonSchema = {
 
 type RequestMode = "json" | "form";
 type FormValues = Record<string, unknown>;
+const BUTTON_DEBOUNCE_MS = 300;
 
 function schemaFor(tool: ToolDef | undefined): JsonSchema | undefined {
   return tool ? (z.toJSONSchema(tool.schema) as JsonSchema) : undefined;
@@ -169,6 +170,8 @@ export function ToolExecution({
   onViewRangeFocus,
   onModeSwitch,
   onToolRun,
+  onEmptyAnswer,
+  onAnswer,
 }: {
   tool: ToolDef | undefined;
   dispatch: Dispatch<ToolAction>;
@@ -178,6 +181,8 @@ export function ToolExecution({
   onViewRangeFocus?: (anchor: HTMLElement) => void;
   onModeSwitch?: (anchor: HTMLElement) => void;
   onToolRun?: () => void;
+  onEmptyAnswer?: (anchor: HTMLElement) => void;
+  onAnswer?: (text: string) => void;
 }) {
   const [mode, setMode] = useState<RequestMode>("form");
   const [formValues, setFormValues] = useState<FormValues>(() =>
@@ -185,9 +190,20 @@ export function ToolExecution({
   );
   const [requestError, setRequestError] = useState("");
   const [answer, setAnswer] = useState("");
+  const lastButtonClickRef = useRef(0);
+  const answerInputRef = useRef<HTMLInputElement>(null);
   const selectedSchema = schemaFor(tool);
 
   if (!tool) return null;
+
+  const buttonClickIsDebounced = () => {
+    const now = Date.now();
+    if (now - lastButtonClickRef.current < BUTTON_DEBOUNCE_MS) {
+      return true;
+    }
+    lastButtonClickRef.current = now;
+    return false;
+  };
 
   return (
     <>
@@ -302,6 +318,7 @@ export function ToolExecution({
           id="tool-run"
           className="action-button send-button"
           onClick={() => {
+            if (buttonClickIsDebounced()) return;
             try {
               const request = JSON.parse(
                 mode === "form"
@@ -344,6 +361,7 @@ export function ToolExecution({
           Respond to user
         </label>
         <input
+          ref={answerInputRef}
           disabled={disabled}
           id="answer-input"
           className="composer-input"
@@ -354,7 +372,15 @@ export function ToolExecution({
         <button
           disabled={disabled}
           className="action-button"
-          onClick={() => dispatch({ type: ActionType.ANSWER, text: answer })}
+          onClick={() => {
+            if (buttonClickIsDebounced()) return;
+            if (!answer.trim()) {
+              if (answerInputRef.current) onEmptyAnswer?.(answerInputRef.current);
+              return;
+            }
+            dispatch({ type: ActionType.ANSWER, text: answer });
+            onAnswer?.(answer);
+          }}
         >
           Send response
         </button>

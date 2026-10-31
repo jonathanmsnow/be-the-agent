@@ -11,6 +11,8 @@ export function ToolView({
   onViewRangeFocus,
   onModeSwitch,
   onToolRun,
+  onEmptyAnswer,
+  onAnswer,
 }: {
   tools: ToolDef[];
   dispatch: Dispatch<ToolAction>;
@@ -18,6 +20,8 @@ export function ToolView({
   onViewRangeFocus?: (anchor: HTMLElement) => void;
   onModeSwitch?: (anchor: HTMLElement) => void;
   onToolRun?: () => void;
+  onEmptyAnswer?: (anchor: HTMLElement) => void;
+  onAnswer?: (text: string) => void;
 }) {
   const [selectedTool, setSelectedTool] = useState(tools[0]);
   const [rawRequest, setRawRequest] = useState(() =>
@@ -48,6 +52,8 @@ export function ToolView({
         onViewRangeFocus={onViewRangeFocus}
         onModeSwitch={onModeSwitch}
         onToolRun={onToolRun}
+        onEmptyAnswer={onEmptyAnswer}
+        onAnswer={onAnswer}
       />
     </div>
   );

@@ -1,0 +1,89 @@
+export type TipTriggerContext = {
+  elapsedMs: number;
+  toolRunCount: number;
+  wrongAnswer?: boolean;
+};
+
+export type TipDefinition = {
+  id: string;
+  label: string;
+  title: string;
+  body: string;
+  targetId?: string;
+  fallbackTargetId?: string;
+  trigger?: (context: TipTriggerContext) => boolean;
+  scenarioId?: string | null;
+};
+
+export const TIP_DEFINITIONS: TipDefinition[] = [
+  {
+    id: "tool-call-prompt",
+    label: "Call a tool",
+    title: "Ready to call a tool?",
+    body: "Choose a tool, run it, and use the results to move the investigation forward.",
+    targetId: "tool-run",
+    trigger: ({ elapsedMs, toolRunCount }) =>
+      toolRunCount === 0 && elapsedMs >= 30_000,
+    scenarioId: null,
+  },
+  {
+    id: "view-range",
+    label: "Read file slices",
+    title: "Read A Section of a File",
+    body: "Read a limited section of a long file instead of all of it. This helps reduce context window usage!",
+    targetId: "view-range",
+    fallbackTargetId: "read-file-tool",
+    scenarioId: null,
+  },
+  {
+    id: "request-mode",
+    label: "Switch request views",
+    title: "Switch Tool Request Views",
+    body: "These are the two ways to visualize the same tool call. The JSON view shows the raw data like an agent might see it, while the form view makes it easier to fill in.",
+    targetId: "request-mode",
+    scenarioId: null,
+  },
+  {
+    id: "tool-result",
+    label: "Read tool results",
+    title: "Read tool results",
+    body: "This is what the agent sees next. Decide: call another tool, or reply to the user.",
+    targetId: "tool-result",
+    fallbackTargetId: "tool-run",
+    scenarioId: null,
+  },
+  {
+    id: "answer-required",
+    label: "Answer the user",
+    title: "Provide a response to the user",
+    body: "Write a response to the user before hitting send. The user will respond to let you know if your response solved their issue.",
+    targetId: "answer-input",
+    scenarioId: null,
+  },
+  {
+    id: "original-user-request",
+    label: "Read the user's request",
+    title: "This is the task to solve",
+    body: "This is what the user wants you to accomplish. Use this original user request to guide your investigation and response.",
+    targetId: "original-user-request",
+    trigger: ({ wrongAnswer }) => wrongAnswer === true,
+    scenarioId: null,
+  },
+];
+
+export function tipsForScenario(scenarioId: string) {
+  return TIP_DEFINITIONS.filter(
+    (tip) => !tip.scenarioId || tip.scenarioId === scenarioId,
+  );
+}
+
+export function tipForTarget(tips: TipDefinition[], targetId: string) {
+  return tips.find((tip) => tip.targetId === targetId || tip.id === targetId);
+}
+
+export function shouldTriggerTip(
+  tip: TipDefinition,
+  context: TipTriggerContext,
+) {
+  return tip.trigger?.(context) ?? false;
+}

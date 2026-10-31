@@ -403,7 +403,6 @@
     background: var(--code-bg);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), var(--shadow);
     font-size: 14px;
-    font-weight: 600;
     line-height: 1.45;
     text-align: left;
   }

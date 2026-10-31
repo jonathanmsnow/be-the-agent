@@ -1,9 +1,14 @@
-import { useReducer, useState, useRef, useEffect, useMemo, useCallback } from "react";
-import { LogEntry } from "../components/LogEntry";
 import {
-  HelpTip,
-  TipsMenu,
-} from "../components/HelpTip";
+  useReducer,
+  useState,
+  useRef,
+  useEffect,
+  useMemo,
+  useCallback,
+} from "react";
+import { LogEntry } from "../components/LogEntry";
+import { HelpTip } from "../components/HelpTip";
+import { TipsMenu } from "../components/TipsMenu";
 import {
   isVisible,
   readSeen,
@@ -22,6 +27,9 @@ import {
 } from "../tools/toolRegistry";
 import { calculateTokens } from "../utils";
 import { reducer, type Action, type State } from "./reducer";
+
+const TOOL_CALL_TIP_INITIAL_DELAY_MS = 30_000;
+const TOOL_CALL_TIP_MAX_DELAY_MS = 5 * 60_000;
 
 const initial: State = {
   log: [],
@@ -75,16 +83,16 @@ export function Simulator({
   const [toolsWidth, setToolsWidth] = useState(38);
   const [completionDismissed, setCompletionDismissed] = useState(false);
   const [seenTips, setSeenTips] = useState(() => readSeen());
+  const seenTipsRef = useRef(seenTips);
   const [activeTip, setActiveTip] = useState<{
     id: string;
     anchor: HTMLElement;
   } | null>(null);
   const [tipsAnchor, setTipsAnchor] = useState<HTMLElement | null>(null);
   const [activityVersion, setActivityVersion] = useState(0);
-  const [idleTipShown, setIdleTipShown] = useState(false);
+  const [idleTipAttempt, setIdleTipAttempt] = useState(0);
   const simulatorRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
-  const [startedAt] = useState(() => Date.now());
   const toolRunCountRef = useRef(0);
 
   const used: number = state.log.reduce(
@@ -104,28 +112,40 @@ export function Simulator({
     () => tipsForScenario(scenarioData.id),
     [scenarioData.id],
   );
-  const openTip = useCallback((
-    targetId: string,
-    fallbackAnchor: HTMLElement | undefined,
-    force = false,
-  ) => {
-    const tip = tipForTarget(scenarioTips, targetId);
-    const anchor =
-      (tip?.targetId && document.getElementById(tip.targetId)) ||
-      fallbackAnchor ||
-      (tip?.fallbackTargetId &&
-        document.getElementById(tip.fallbackTargetId));
-    if (
-      !tip ||
-      !anchor ||
-      (!force && (activeTip || seenTips.has(tip.id))) ||
-      !isVisible(anchor)
-    ) {
-      return;
-    }
-    setTipsAnchor(null);
-    setActiveTip({ id: tip.id, anchor });
-  }, [activeTip, seenTips, scenarioTips]);
+  const openTip = useCallback(
+    (
+      targetId: string,
+      fallbackAnchor: HTMLElement | undefined,
+      force = false,
+    ) => {
+      const tip = tipForTarget(scenarioTips, targetId);
+      const anchor =
+        (tip?.targetId && document.getElementById(tip.targetId)) ||
+        fallbackAnchor ||
+        (tip?.fallbackTargetId &&
+          document.getElementById(tip.fallbackTargetId));
+      if (
+        !tip ||
+        !anchor ||
+        (!force && (activeTip || seenTips.has(tip.id))) ||
+        !isVisible(anchor)
+      ) {
+        return;
+      }
+      setTipsAnchor(null);
+      setActiveTip({ id: tip.id, anchor });
+    },
+    [activeTip, seenTips, scenarioTips],
+  );
+  const openTipRef = useRef(openTip);
+
+  useEffect(() => {
+    openTipRef.current = openTip;
+  }, [openTip]);
+
+  useEffect(() => {
+    seenTipsRef.current = seenTips;
+  }, [seenTips]);
 
   const showTip = (targetId: string, anchor: HTMLElement) =>
     openTip(targetId, anchor);
@@ -158,30 +178,88 @@ export function Simulator({
     }, 350);
   };
 
+  const scrollToOriginalRequest = () => {
+    const request = document.getElementById("original-user-request");
+    const chatPane = document.querySelector<HTMLElement>(".chat-pane");
+    if (!request || !chatPane) return;
+    chatPane.scrollTo({
+      top: Math.max(0, request.offsetTop - chatPane.clientHeight / 2),
+      behavior: "auto",
+    });
+    return request;
+  };
+
+  const showOriginalRequestTip = () => {
+    const request = scrollToOriginalRequest();
+    if (!request || seenTips.has("original-user-request")) return;
+    window.setTimeout(() => {
+      setTipsAnchor(null);
+      setActiveTip({ id: "original-user-request", anchor: request });
+    }, 100);
+  };
+
+  const remindOriginalRequestAfterWrongAnswer = (answer: string) => {
+    const step = scenarioData.answerSteps?.[state.answerStepIndex];
+    const keywords = step?.keywords ?? scenarioData.answerKeywords;
+    const tip = tipForTarget(scenarioTips, "original-user-request");
+    if (
+      tip &&
+      shouldTriggerTip(tip, {
+        elapsedMs: 0,
+        toolRunCount: toolRunCountRef.current,
+        wrongAnswer: !keywords.every((keyword) => answer.includes(keyword)),
+      })
+    ) {
+      showOriginalRequestTip();
+    }
+  };
+
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [state.log.length]);
 
   useEffect(() => {
+    const tipTimer = window.setTimeout(() => {
+      const request = scrollToOriginalRequest();
+      if (!request || seenTipsRef.current.has("original-user-request")) {
+        return;
+      }
+      setActiveTip({ id: "original-user-request", anchor: request });
+    }, 15_000);
+    return () => window.clearTimeout(tipTimer);
+  }, [scenarioData.id]);
+
+  useEffect(() => {
+    if (
+      activeTip ||
+      toolRunCountRef.current > 0 ||
+      seenTips.has("tool-call-prompt")
+    ) {
+      return;
+    }
+
+    const delay = Math.min(
+      TOOL_CALL_TIP_INITIAL_DELAY_MS * 2 ** idleTipAttempt,
+      TOOL_CALL_TIP_MAX_DELAY_MS,
+    );
     const timer = window.setTimeout(() => {
       const tip = tipForTarget(
         tipsForScenario(scenarioData.id),
         "tool-call-prompt",
       );
       if (
-        !idleTipShown &&
         tip &&
         shouldTriggerTip(tip, {
-          elapsedMs: Date.now() - startedAt,
+          elapsedMs: delay,
           toolRunCount: toolRunCountRef.current,
         })
       ) {
-        setIdleTipShown(true);
-        openTip(tip.id, undefined);
+        setIdleTipAttempt((attempt) => attempt + 1);
+        openTipRef.current(tip.id, undefined);
       }
-    }, 10_000);
+    }, delay);
     return () => window.clearTimeout(timer);
-  }, [activityVersion, idleTipShown, openTip, scenarioData.id, startedAt]);
+  }, [activeTip, activityVersion, idleTipAttempt, scenarioData.id, seenTips]);
 
   const resizeFromPointer = (clientX: number) => {
     const bounds = simulatorRef.current?.getBoundingClientRect();
@@ -245,6 +323,8 @@ export function Simulator({
           disabled={compactionRequired}
           onViewRangeFocus={(anchor) => showTip("view-range", anchor)}
           onModeSwitch={(anchor) => showTip("request-mode", anchor)}
+          onEmptyAnswer={(anchor) => openTip("answer-required", anchor, true)}
+          onAnswer={remindOriginalRequestAfterWrongAnswer}
           onToolRun={() => {
             markToolRun();
             showLatestResultTip();
@@ -288,12 +368,12 @@ export function Simulator({
       <div
         className="chat-pane"
         role="region"
-        aria-label="Live simulator"
+        aria-label="Context Window"
         tabIndex={0}
       >
         <div className="simulator-sticky">
           <div className="simulator-header">
-            <span className="simulator-label">LIVE SIMULATOR</span>
+            <span className="simulator-label">CONTEXT WINDOW</span>
           </div>
           {contextTrackingEnabled && (
             <ContextIndicator
@@ -310,6 +390,7 @@ export function Simulator({
             <LogEntry
               key={i}
               entry={e}
+              id={i === 2 ? "original-user-request" : undefined}
               showTokens={contextTrackingEnabled}
             />
           ))}
@@ -327,8 +408,8 @@ export function Simulator({
           >
             <h2 id="completion-title">Scenario complete</h2>
             <p>
-              You answered all questions correctly. You can continue to
-              interact with the environment if you wish.
+              You answered all questions correctly. You can continue to interact
+              with the environment if you wish.
             </p>
             <button
               className="action-button"
@@ -345,9 +426,7 @@ export function Simulator({
           title={
             scenarioTips.find((tip) => tip.id === activeTip.id)?.title ?? ""
           }
-          body={
-            scenarioTips.find((tip) => tip.id === activeTip.id)?.body ?? ""
-          }
+          body={scenarioTips.find((tip) => tip.id === activeTip.id)?.body ?? ""}
           onClose={() => setActiveTip(null)}
           onStopReminding={() => stopReminding(activeTip.id)}
         />
