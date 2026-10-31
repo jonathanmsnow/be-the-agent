@@ -1,0 +1,23 @@
+[
+  {
+    "id": "view-range",
+    "label": "Read file slices",
+    "text": "Optional. Read just a slice of a long file instead of all of it.",
+    "targetId": "view-range",
+    "scenarioId": null
+  },
+  {
+    "id": "request-mode",
+    "label": "Switch request views",
+    "text": "Same request, two views. The agent sends the JSON; the form builds it for you.",
+    "targetId": "request-mode",
+    "scenarioId": null
+  },
+  {
+    "id": "tool-result",
+    "label": "Read tool results",
+    "text": "This is what the agent sees next. Decide: call another tool, or reply to the user.",
+    "targetId": "tool-result",
+    "scenarioId": null
+  }
+]

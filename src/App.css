@@ -375,6 +375,120 @@
     letter-spacing: 1px;
   }
 
+.tips-button {
+    min-width: 48px;
+    height: 26px;
+    margin-left: auto;
+    padding: 2px 9px;
+    border: 1px dashed var(--accent-border);
+    border-radius: 5px;
+    color: var(--text-h);
+    background: transparent;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+.help-tip {
+    position: fixed;
+    z-index: 20;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    width: min(320px, calc(100vw - 32px));
+    box-sizing: border-box;
+    padding: 13px 14px;
+    border: 2px solid var(--accent-border);
+    border-radius: 8px;
+    color: var(--text-h);
+    background: var(--code-bg);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), var(--shadow);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.45;
+    text-align: left;
+  }
+
+.help-tip-arrow {
+    position: absolute;
+    top: -6px;
+    left: 18px;
+    width: 10px;
+    height: 10px;
+    border-top: 2px solid var(--accent-border);
+    border-left: 2px solid var(--accent-border);
+    background: var(--code-bg);
+    transform: rotate(45deg);
+  }
+
+.help-tip.above .help-tip-arrow {
+    top: auto;
+    bottom: -6px;
+    border-top: 0;
+    border-left: 0;
+    border-right: 2px solid var(--accent-border);
+    border-bottom: 2px solid var(--accent-border);
+  }
+
+.help-tip-close {
+    flex: 0 0 auto;
+    margin: -4px -5px 0 auto;
+    padding: 0 4px;
+    border: 0;
+    color: var(--text-h);
+    background: transparent;
+    font-size: 20px;
+    line-height: 1;
+  }
+
+.tips-menu {
+    display: block;
+    width: min(390px, calc(100vw - 32px));
+  }
+
+.tips-menu ul {
+    display: grid;
+    gap: 4px;
+    margin: 8px 0 12px;
+    padding: 0;
+    list-style: none;
+    font-size: 12px;
+  }
+
+.tips-menu li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 4px;
+    color: var(--text-h);
+  }
+
+.tips-checkbox {
+    display: flex;
+    cursor: pointer;
+  }
+
+.tips-item {
+    padding: 2px 4px;
+    border: 0;
+    color: inherit;
+    background: transparent;
+    font: inherit;
+    text-align: left;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-underline-offset: 3px;
+  }
+
+.tips-menu li label:hover {
+    background: var(--accent-bg);
+  }
+
+.tips-menu input {
+    width: 15px;
+    height: 15px;
+    accent-color: var(--accent-border);
+  }
+
 .context-meter {
     padding: 10px 0 12px;
   }

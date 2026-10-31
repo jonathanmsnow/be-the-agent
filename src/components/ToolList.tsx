@@ -22,7 +22,6 @@ export function ToolList({
           aria-selected={selectedTool === tool.name}
           onClick={() => onSelect(tool)}
         >
-          <span className="tool-method">POST</span>
           <span>{tool.name}</span>
         </button>
       ))}

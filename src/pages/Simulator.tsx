@@ -1,5 +1,16 @@
 import { useReducer, useState, useRef, useEffect } from "react";
 import { LogEntry } from "../components/LogEntry";
+import {
+  HelpTip,
+  TipsMenu,
+} from "../components/HelpTip";
+import {
+  isVisible,
+  readSeen,
+  tipForTarget,
+  tipsForScenario,
+  writeSeen,
+} from "../components/helpTipState";
 import { ContextIndicator } from "../components/ContextTracker";
 import { ToolView } from "../components/ToolView";
 import { SummaryPrompt } from "../components/SummaryPrompt";
@@ -62,6 +73,12 @@ export function Simulator({
 
   const [toolsWidth, setToolsWidth] = useState(38);
   const [completionDismissed, setCompletionDismissed] = useState(false);
+  const [seenTips, setSeenTips] = useState(() => readSeen());
+  const [activeTip, setActiveTip] = useState<{
+    id: string;
+    anchor: HTMLElement;
+  } | null>(null);
+  const [tipsAnchor, setTipsAnchor] = useState<HTMLElement | null>(null);
   const simulatorRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -78,6 +95,48 @@ export function Simulator({
     ? Math.min(100, (used / contextLimit) * 100)
     : 0;
   const compactionRequired = contextTrackingEnabled && pct >= 85;
+  const scenarioTips = tipsForScenario(scenarioData.id);
+  const openTip = (
+    targetId: string,
+    fallbackAnchor: HTMLElement,
+    force = false,
+  ) => {
+    const tip = tipForTarget(scenarioTips, targetId);
+    const anchor = tip?.targetId
+      ? document.getElementById(tip.targetId) ?? fallbackAnchor
+      : fallbackAnchor;
+    if (
+      !tip ||
+      (!force && (activeTip || seenTips.has(tip.id))) ||
+      !isVisible(anchor)
+    ) {
+      return;
+    }
+    const nextSeen = new Set(seenTips).add(tip.id);
+    setSeenTips(nextSeen);
+    writeSeen(nextSeen);
+    setTipsAnchor(null);
+    setActiveTip({ id: tip.id, anchor });
+  };
+
+  const showTip = (targetId: string, anchor: HTMLElement) =>
+    openTip(targetId, anchor);
+
+  const toggleTipSeen = (id: string, checked: boolean) => {
+    const nextSeen = new Set(seenTips);
+    if (checked) nextSeen.add(id);
+    else nextSeen.delete(id);
+    setSeenTips(nextSeen);
+    writeSeen(nextSeen);
+  };
+
+  const showLatestResultTip = () => {
+    window.setTimeout(() => {
+      const results = document.querySelectorAll<HTMLElement>(".entry.result");
+      const result = results[results.length - 1];
+      if (result) showTip("tool-result", result);
+    }, 350);
+  };
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -123,7 +182,18 @@ export function Simulator({
               Restart scenario
             </button>
           </div>
-          <span className="simulator-label">Agent Tools</span>
+          <button
+            type="button"
+            className="tips-button"
+            aria-haspopup="dialog"
+            aria-expanded={tipsAnchor !== null}
+            onClick={(event) => {
+              setActiveTip(null);
+              setTipsAnchor(event.currentTarget);
+            }}
+          >
+            Tips
+          </button>
         </div>
         <ToolView
           tools={scenarioData.tools.flatMap((name) => {
@@ -132,6 +202,9 @@ export function Simulator({
           })}
           dispatch={dispatch}
           disabled={compactionRequired}
+          onViewRangeFocus={(anchor) => showTip("view-range", anchor)}
+          onModeSwitch={(anchor) => showTip("request-mode", anchor)}
+          onToolRun={showLatestResultTip}
         />
       </aside>
 
@@ -221,6 +294,29 @@ export function Simulator({
             </button>
           </section>
         </div>
+      )}
+      {activeTip && (
+        <HelpTip
+          anchor={activeTip.anchor}
+          text={
+            scenarioTips.find((tip) => tip.id === activeTip.id)?.text ??
+            ""
+          }
+          onClose={() => setActiveTip(null)}
+        />
+      )}
+      {tipsAnchor && (
+        <TipsMenu
+          anchor={tipsAnchor}
+          seen={seenTips}
+          tips={scenarioTips}
+          onShowTip={(tip, anchor) => {
+            openTip(tip.id, anchor, true);
+            setTipsAnchor(null);
+          }}
+          onToggleSeen={toggleTipSeen}
+          onClose={() => setTipsAnchor(null)}
+        />
       )}
     </main>
   );

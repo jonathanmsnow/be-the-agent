@@ -84,6 +84,7 @@ function FormField({
   path,
   required,
   onChange,
+  onFocus,
 }: {
   name: string;
   schema: JsonSchema;
@@ -91,12 +92,17 @@ function FormField({
   path: string[];
   required: boolean;
   onChange: (path: string[], value: unknown) => void;
+  onFocus?: (anchor: HTMLElement) => void;
 }) {
   if (schema.type === "object" && schema.properties) {
     const objectValue =
       typeof value === "object" && value ? (value as FormValues) : {};
     return (
-      <fieldset className="form-fieldset">
+      <fieldset
+        id={name === "view_range" ? "view-range" : undefined}
+        className="form-fieldset"
+        onFocus={onFocus ? (event) => onFocus(event.currentTarget) : undefined}
+      >
         <legend>
           {name}
           <small> ({required ? "required" : "optional"})</small>
@@ -108,10 +114,9 @@ function FormField({
             schema={childSchema}
             value={objectValue[childName]}
             path={[...path, childName]}
-            required={
-              required && (schema.required ?? []).includes(childName)
-            }
+            required={required && (schema.required ?? []).includes(childName)}
             onChange={onChange}
+            onFocus={onFocus}
           />
         ))}
       </fieldset>
@@ -161,12 +166,18 @@ export function ToolExecution({
   disabled,
   rawRequest,
   setRawRequest,
+  onViewRangeFocus,
+  onModeSwitch,
+  onToolRun,
 }: {
   tool: ToolDef | undefined;
   dispatch: Dispatch<ToolAction>;
   disabled: boolean;
   rawRequest: string;
   setRawRequest: (value: string) => void;
+  onViewRangeFocus?: (anchor: HTMLElement) => void;
+  onModeSwitch?: (anchor: HTMLElement) => void;
+  onToolRun?: () => void;
 }) {
   const [mode, setMode] = useState<RequestMode>("form");
   const [formValues, setFormValues] = useState<FormValues>(() =>
@@ -182,11 +193,11 @@ export function ToolExecution({
     <>
       <div className="tool-request">
         <div className="tool-request-heading">
-          <span className="tool-method">POST</span>
           <strong>{tool.name}</strong>
         </div>
         <p className="tool-description">{tool.description}</p>
         <div
+          id="request-mode"
           className="request-mode-toggle"
           role="tablist"
           aria-label="Request body representation"
@@ -199,7 +210,12 @@ export function ToolExecution({
               disabled={disabled || mode === nextMode}
               role="tab"
               aria-selected={mode === nextMode}
-              onClick={() => {
+              onClick={(event) => {
+                if (nextMode !== mode) {
+                  onModeSwitch?.(
+                    event.currentTarget.parentElement ?? event.currentTarget,
+                  );
+                }
                 if (nextMode === "form") {
                   try {
                     setFormValues(formValuesFromRequest(rawRequest, tool));
@@ -214,7 +230,11 @@ export function ToolExecution({
                   }
                 } else {
                   setRawRequest(
-                    JSON.stringify({ tool: tool.name, args: formValues }, null, 2),
+                    JSON.stringify(
+                      { tool: tool.name, args: formValues },
+                      null,
+                      2,
+                    ),
                   );
                   setRequestError("");
                 }
@@ -254,6 +274,7 @@ export function ToolExecution({
                   value={formValues[name]}
                   path={[name]}
                   required={(selectedSchema?.required ?? []).includes(name)}
+                  onFocus={name === "view_range" ? onViewRangeFocus : undefined}
                   onChange={(path, value) => {
                     const nextValues = updateValue(formValues, path, value);
                     setFormValues(nextValues);
@@ -294,6 +315,7 @@ export function ToolExecution({
               }
               setRequestError("");
               dispatch({ type: ActionType.RUN, call: request });
+              onToolRun?.();
             } catch (error) {
               if (error instanceof SyntaxError) {
                 setRequestError("");
@@ -301,6 +323,7 @@ export function ToolExecution({
                   type: ActionType.RUN,
                   call: { tool: tool.name, args: rawRequest },
                 });
+                onToolRun?.();
                 return;
               }
               setRequestError(

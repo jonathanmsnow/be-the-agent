@@ -8,10 +8,16 @@ export function ToolView({
   tools,
   dispatch,
   disabled = false,
+  onViewRangeFocus,
+  onModeSwitch,
+  onToolRun,
 }: {
   tools: ToolDef[];
   dispatch: Dispatch<ToolAction>;
   disabled?: boolean;
+  onViewRangeFocus?: (anchor: HTMLElement) => void;
+  onModeSwitch?: (anchor: HTMLElement) => void;
+  onToolRun?: () => void;
 }) {
   const [selectedTool, setSelectedTool] = useState(tools[0]);
   const [rawRequest, setRawRequest] = useState(() =>
@@ -25,7 +31,7 @@ export function ToolView({
 
   return (
     <div className="tool-client">
-      <div className="tool-section-label">COLLECTION / TOOLS</div>
+      <div className="tool-section-label">TOOLS</div>
       <ToolList
         tools={tools}
         selectedTool={selectedTool?.name ?? ""}
@@ -39,6 +45,9 @@ export function ToolView({
         disabled={disabled}
         rawRequest={rawRequest}
         setRawRequest={setRawRequest}
+        onViewRangeFocus={onViewRangeFocus}
+        onModeSwitch={onModeSwitch}
+        onToolRun={onToolRun}
       />
     </div>
   );
