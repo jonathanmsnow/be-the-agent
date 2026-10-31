@@ -4,12 +4,16 @@ import type { TipDefinition } from "./helpTipState";
 
 export function HelpTip({
   anchor,
-  text,
+  title,
+  body,
   onClose,
+  onStopReminding,
 }: {
   anchor: HTMLElement;
-  text: string;
+  title: string;
+  body: string;
   onClose: () => void;
+  onStopReminding: () => void;
 }) {
   const [position, setPosition] = useState({
     top: 0,
@@ -71,7 +75,13 @@ export function HelpTip({
       style={{ top: position.top, left: position.left }}
     >
       <span className="help-tip-arrow" aria-hidden="true" />
-      <span>{text}</span>
+      <div className="help-tip-content">
+        <strong className="help-tip-title">{title}</strong>
+        <span>{body}</span>
+        <button type="button" className="help-tip-stop" onClick={onStopReminding}>
+          Stop reminding me
+        </button>
+      </div>
       <button type="button" className="help-tip-close" onClick={onClose}>
         <span className="sr-only">Dismiss tip</span>
         ×
@@ -132,7 +142,7 @@ export function TipsMenu({
             <label className="tips-checkbox">
               <input
                 type="checkbox"
-                aria-label={`Show ${tip.label} automatically`}
+                aria-label={`Stop reminding me about ${tip.label}`}
                 checked={seen.has(tip.id)}
                 onChange={(event) =>
                   onToggleSeen(tip.id, event.currentTarget.checked)

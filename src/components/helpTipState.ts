@@ -3,8 +3,11 @@ import tipDefinitions from "./helpTips.json";
 export type TipDefinition = {
   id: string;
   label: string;
-  text: string;
+  title: string;
+  body: string;
   targetId?: string;
+  fallbackTargetId?: string;
+  triggerId?: string;
   scenarioId?: string | null;
 };
 
@@ -18,6 +21,25 @@ export function tipsForScenario(scenarioId: string) {
 
 export function tipForTarget(tips: TipDefinition[], targetId: string) {
   return tips.find((tip) => tip.targetId === targetId || tip.id === targetId);
+}
+
+export type TipTriggerContext = {
+  elapsedMs: number;
+  toolRunCount: number;
+};
+
+type TipTrigger = (context: TipTriggerContext) => boolean;
+
+const TIP_TRIGGERS: Record<string, TipTrigger> = {
+  idleBeforeTool: ({ elapsedMs, toolRunCount }) =>
+    toolRunCount === 0 && elapsedMs >= 10_000,
+};
+
+export function shouldTriggerTip(
+  tip: TipDefinition,
+  context: TipTriggerContext,
+) {
+  return tip.triggerId ? TIP_TRIGGERS[tip.triggerId]?.(context) ?? false : false;
 }
 
 const STORAGE_KEY = "be-the-agent-seen-tips";

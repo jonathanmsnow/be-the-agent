@@ -440,6 +440,27 @@
     line-height: 1;
   }
 
+.help-tip-content {
+    display: grid;
+    gap: 8px;
+  }
+
+.help-tip-title {
+    font-size: 15px;
+  }
+
+.help-tip-stop {
+    width: fit-content;
+    padding: 3px 7px;
+    border: 1px solid var(--accent-border);
+    border-radius: 4px;
+    color: var(--text-h);
+    background: var(--accent-bg);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
 .tips-menu {
     display: block;
     width: min(390px, calc(100vw - 32px));

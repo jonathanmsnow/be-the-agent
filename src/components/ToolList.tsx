@@ -16,6 +16,7 @@ export function ToolList({
       {tools.map((tool) => (
         <button
           disabled={disabled}
+          id={tool.name === "read_file" ? "read-file-tool" : undefined}
           className={`tool-item${selectedTool === tool.name ? " selected" : ""}`}
           key={tool.name}
           role="option"

@@ -299,6 +299,7 @@ export function ToolExecution({
         )}
         <button
           disabled={disabled}
+          id="tool-run"
           className="action-button send-button"
           onClick={() => {
             try {

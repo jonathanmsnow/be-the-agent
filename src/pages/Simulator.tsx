@@ -1,4 +1,4 @@
-import { useReducer, useState, useRef, useEffect } from "react";
+import { useReducer, useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { LogEntry } from "../components/LogEntry";
 import {
   HelpTip,
@@ -7,6 +7,7 @@ import {
 import {
   isVisible,
   readSeen,
+  shouldTriggerTip,
   tipForTarget,
   tipsForScenario,
   writeSeen,
@@ -79,8 +80,12 @@ export function Simulator({
     anchor: HTMLElement;
   } | null>(null);
   const [tipsAnchor, setTipsAnchor] = useState<HTMLElement | null>(null);
+  const [activityVersion, setActivityVersion] = useState(0);
+  const [idleTipShown, setIdleTipShown] = useState(false);
   const simulatorRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const [startedAt] = useState(() => Date.now());
+  const toolRunCountRef = useRef(0);
 
   const used: number = state.log.reduce(
     (sum, e) => sum + (e.evicted ? 0 : e.tokens),
@@ -95,29 +100,32 @@ export function Simulator({
     ? Math.min(100, (used / contextLimit) * 100)
     : 0;
   const compactionRequired = contextTrackingEnabled && pct >= 85;
-  const scenarioTips = tipsForScenario(scenarioData.id);
-  const openTip = (
+  const scenarioTips = useMemo(
+    () => tipsForScenario(scenarioData.id),
+    [scenarioData.id],
+  );
+  const openTip = useCallback((
     targetId: string,
-    fallbackAnchor: HTMLElement,
+    fallbackAnchor: HTMLElement | undefined,
     force = false,
   ) => {
     const tip = tipForTarget(scenarioTips, targetId);
-    const anchor = tip?.targetId
-      ? document.getElementById(tip.targetId) ?? fallbackAnchor
-      : fallbackAnchor;
+    const anchor =
+      (tip?.targetId && document.getElementById(tip.targetId)) ||
+      fallbackAnchor ||
+      (tip?.fallbackTargetId &&
+        document.getElementById(tip.fallbackTargetId));
     if (
       !tip ||
+      !anchor ||
       (!force && (activeTip || seenTips.has(tip.id))) ||
       !isVisible(anchor)
     ) {
       return;
     }
-    const nextSeen = new Set(seenTips).add(tip.id);
-    setSeenTips(nextSeen);
-    writeSeen(nextSeen);
     setTipsAnchor(null);
     setActiveTip({ id: tip.id, anchor });
-  };
+  }, [activeTip, seenTips, scenarioTips]);
 
   const showTip = (targetId: string, anchor: HTMLElement) =>
     openTip(targetId, anchor);
@@ -128,6 +136,18 @@ export function Simulator({
     else nextSeen.delete(id);
     setSeenTips(nextSeen);
     writeSeen(nextSeen);
+  };
+
+  const stopReminding = (id: string) => {
+    const nextSeen = new Set(seenTips).add(id);
+    setSeenTips(nextSeen);
+    writeSeen(nextSeen);
+    setActiveTip(null);
+  };
+
+  const markToolRun = () => {
+    toolRunCountRef.current += 1;
+    setActivityVersion((version) => version + 1);
   };
 
   const showLatestResultTip = () => {
@@ -141,6 +161,27 @@ export function Simulator({
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [state.log.length]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      const tip = tipForTarget(
+        tipsForScenario(scenarioData.id),
+        "tool-call-prompt",
+      );
+      if (
+        !idleTipShown &&
+        tip &&
+        shouldTriggerTip(tip, {
+          elapsedMs: Date.now() - startedAt,
+          toolRunCount: toolRunCountRef.current,
+        })
+      ) {
+        setIdleTipShown(true);
+        openTip(tip.id, undefined);
+      }
+    }, 10_000);
+    return () => window.clearTimeout(timer);
+  }, [activityVersion, idleTipShown, openTip, scenarioData.id, startedAt]);
 
   const resizeFromPointer = (clientX: number) => {
     const bounds = simulatorRef.current?.getBoundingClientRect();
@@ -204,7 +245,10 @@ export function Simulator({
           disabled={compactionRequired}
           onViewRangeFocus={(anchor) => showTip("view-range", anchor)}
           onModeSwitch={(anchor) => showTip("request-mode", anchor)}
-          onToolRun={showLatestResultTip}
+          onToolRun={() => {
+            markToolRun();
+            showLatestResultTip();
+          }}
         />
       </aside>
 
@@ -298,11 +342,14 @@ export function Simulator({
       {activeTip && (
         <HelpTip
           anchor={activeTip.anchor}
-          text={
-            scenarioTips.find((tip) => tip.id === activeTip.id)?.text ??
-            ""
+          title={
+            scenarioTips.find((tip) => tip.id === activeTip.id)?.title ?? ""
+          }
+          body={
+            scenarioTips.find((tip) => tip.id === activeTip.id)?.body ?? ""
           }
           onClose={() => setActiveTip(null)}
+          onStopReminding={() => stopReminding(activeTip.id)}
         />
       )}
       {tipsAnchor && (
@@ -310,8 +357,8 @@ export function Simulator({
           anchor={tipsAnchor}
           seen={seenTips}
           tips={scenarioTips}
-          onShowTip={(tip, anchor) => {
-            openTip(tip.id, anchor, true);
+          onShowTip={(tip) => {
+            openTip(tip.id, undefined, true);
             setTipsAnchor(null);
           }}
           onToggleSeen={toggleTipSeen}
