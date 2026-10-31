@@ -23,7 +23,10 @@ export function ToolList({
           aria-selected={selectedTool === tool.name}
           onClick={() => onSelect(tool)}
         >
-          <span>{tool.name}</span>
+          <span className="tool-name">{tool.name}</span>
+          <span className="tool-summary" title={tool.description}>
+            {tool.description}
+          </span>
         </button>
       ))}
     </div>

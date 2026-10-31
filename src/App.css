@@ -401,16 +401,36 @@
   }
 
 .tips-button {
-    min-width: 48px;
-    height: 26px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    min-width: 74px;
+    height: 30px;
     margin-left: auto;
-    padding: 2px 9px;
-    border: 1px dashed var(--accent-border);
+    padding: 4px 10px;
+    border: 1px solid var(--accent-border);
     border-radius: 5px;
     color: var(--text-h);
-    background: transparent;
+    background: var(--accent-bg);
     font-size: 12px;
     font-weight: 700;
+  }
+
+.tips-button:hover,
+.tips-button:focus-visible {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: var(--button-text);
+  }
+
+.tips-button-icon {
+    width: 15px;
+    height: 15px;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
   }
 
 .help-tip {
@@ -495,6 +515,17 @@
     width: min(390px, calc(100vw - 32px));
   }
 
+.tips-menu-title,
+.tips-menu-description {
+    display: block;
+  }
+
+.tips-menu-description {
+    margin-top: 4px;
+    color: var(--text);
+    font-size: 12px;
+  }
+
 .tips-menu ul {
     display: grid;
     gap: 4px;
@@ -548,6 +579,11 @@
     justify-content: space-between;
     margin-bottom: 7px;
     font-size: 13px;
+  }
+
+.context-meter-label > span {
+    display: inline-flex;
+    align-items: center;
   }
 
 .context-meter-track {
@@ -730,6 +766,20 @@
     text-align: left;
     font-family: var(--mono);
     font-size: 13px;
+  }
+
+.tool-name {
+    flex: 0 0 auto;
+  }
+
+.tool-summary {
+    min-width: 0;
+    overflow: hidden;
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
 .tool-item:hover,

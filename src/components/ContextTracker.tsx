@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ROLE, type Entry } from "../engine/types";
+import { HelpTipTrigger } from "./HelpTip";
 
 const resourceLabels = {
   [ROLE.RESULT]: "Tools",
@@ -15,11 +16,13 @@ export function ContextIndicator({
   contextLimit,
   pct,
   entries,
+  onTokensHelp,
 }: {
   used: number;
   contextLimit: number;
   pct: number;
   entries: Entry[];
+  onTokensHelp?: (persistent: boolean) => void;
 }) {
   const [highlightedRole, setHighlightedRole] = useState<ResourceRole | null>(
     null,
@@ -47,6 +50,12 @@ export function ContextIndicator({
         <b>CONTEXT</b>
         <span>
           {used} / {contextLimit} tokens
+          <HelpTipTrigger
+            id="tokens-help"
+            label="Learn about tokens"
+            onHover={() => onTokensHelp?.(false)}
+            onClick={() => onTokensHelp?.(true)}
+          />
         </span>
       </div>
 

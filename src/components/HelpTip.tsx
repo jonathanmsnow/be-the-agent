@@ -99,10 +99,7 @@ export function HelpTip({
     let closeTimer: number | undefined;
     const closeIfUnhovered = () => {
       closeTimer = window.setTimeout(() => {
-        if (
-          !anchor.matches(":hover") &&
-          !tipRef.current?.matches(":hover")
-        ) {
+        if (!anchor.matches(":hover") && !tipRef.current?.matches(":hover")) {
           onClose();
         }
       }, 120);
@@ -156,7 +153,7 @@ export function HelpTip({
             className="help-tip-stop"
             onClick={onStopReminding}
           >
-            Stop showing tip
+            Stop showing this tip
           </button>
         )}
       </div>

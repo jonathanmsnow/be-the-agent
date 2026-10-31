@@ -22,9 +22,21 @@ export type TipDefinition = {
 
 export const TIP_DEFINITIONS: TipDefinition[] = [
   {
+    id: "tokens",
+    label: "Tokens",
+    title: "Tokens",
+    body: "Tokens are small pieces of text that an AI model reads and generates. Words, punctuation, and spaces can each use one or more tokens depending on the tokenization method used. The token count shows how much of the context window is currently in use.",
+    targetId: "tokens-help",
+    learnMoreUrl:
+      "https://learn.microsoft.com/en-us/dotnet/ai/conceptual/understanding-tokens",
+    hoverOnly: true,
+    contextual: true,
+    scenarioId: null,
+  },
+  {
     id: "tools",
     label: "Tools",
-    title: "Tools",
+    title: "Agent Tools",
     body: "Tools let an agent inspect context and take actions in the environment. Choose the tool that gathers the evidence or makes the change needed for the user's request.",
     learnMoreUrl: "https://www.ibm.com/think/topics/tool-calling",
     targetId: "tools-help",
@@ -35,8 +47,8 @@ export const TIP_DEFINITIONS: TipDefinition[] = [
   {
     id: "context-window",
     label: "Context windows",
-    title: "Context Windows",
-    body: "A context window is the amount of information an agent can keep available while working. As it fills, older information may need to be compacted or removed.",
+    title: "Context Window",
+    body: "The Context Window is the amount of input (like text) that an AI system can process at one time during a task. Think of it as a model’s short-term memory. A model can only consider so much text when generating its next response, and once the conversation exceeds its context window, the model starts “forgetting” prior responses. (Stanford University, Human-Centered Artificial Intelligence)",
     learnMoreUrl:
       "https://docs.github.com/en/copilot/concepts/prompting-and-context/context-management",
     hoverOnly: true,

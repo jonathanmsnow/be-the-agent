@@ -46,7 +46,10 @@ export function TipsMenu({
       aria-label="Tips"
       style={{ top: rect.bottom + 8, right: window.innerWidth - rect.right }}
     >
-      <strong>Tips</strong>
+      <strong className="tips-menu-title">Tips &amp; guidance</strong>
+      <span className="tips-menu-description">
+        Open any tip again, or check it off to stop reminders.
+      </span>
       <ul>
         {tips.filter((tip) => !tip.contextual).map((tip) => (
           <li key={tip.id}>

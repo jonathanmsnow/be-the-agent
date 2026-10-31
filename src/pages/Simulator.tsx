@@ -133,7 +133,7 @@ export function Simulator({
         !anchor ||
         (!force &&
           (activeTips.some((active) => active.id === tip.id) ||
-            seenTips.has(tip.id))) ||
+            (!tip.contextual && seenTips.has(tip.id)))) ||
         !isVisible(anchor)
       ) {
         return;
@@ -373,7 +373,14 @@ export function Simulator({
               setTipsAnchor(event.currentTarget);
             }}
           >
-            Tips
+            <svg
+              className="tips-button-icon"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path d="M9 18h6M10 22h4M8.7 14.5A6 6 0 1 1 15.3 14.5c-.8.6-1.3 1.4-1.3 2.5h-4c0-1.1-.5-1.9-1.3-2.5Z" />
+            </svg>
+            <span>Tips</span>
           </button>
         </div>
         <ToolView
@@ -455,6 +462,9 @@ export function Simulator({
               contextLimit={contextLimit}
               pct={pct}
               entries={state.log}
+              onTokensHelp={(persistent) =>
+                openTip("tokens", undefined, persistent)
+              }
             />
           )}
         </div>
@@ -523,8 +533,22 @@ export function Simulator({
           seen={seenTips}
           tips={scenarioTips}
           onShowTip={(tip) => {
-            openTip(tip.id, undefined, true);
             setTipsAnchor(null);
+            const anchor: HTMLElement | null =
+              (tip.targetId
+                ? document.getElementById(tip.targetId)
+                : null) ||
+              (tip.fallbackTargetId
+                ? document.getElementById(tip.fallbackTargetId)
+                : null);
+            anchor?.scrollIntoView({
+              behavior: "auto",
+              block: "center",
+              inline: "nearest",
+            });
+            window.requestAnimationFrame(() => {
+              openTip(tip.id, anchor ?? undefined, true);
+            });
           }}
           onToggleSeen={toggleTipSeen}
           onClose={() => setTipsAnchor(null)}
