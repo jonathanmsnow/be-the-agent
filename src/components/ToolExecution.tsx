@@ -170,6 +170,7 @@ export function ToolExecution({
   onViewRangeFocus,
   onModeSwitch,
   onToolRun,
+  onAnswerFocus,
   onEmptyAnswer,
   onAnswer,
 }: {
@@ -181,6 +182,7 @@ export function ToolExecution({
   onViewRangeFocus?: (anchor: HTMLElement) => void;
   onModeSwitch?: (anchor: HTMLElement) => void;
   onToolRun?: () => void;
+  onAnswerFocus?: (anchor: HTMLElement) => void;
   onEmptyAnswer?: (anchor: HTMLElement) => void;
   onAnswer?: (text: string) => void;
 }) {
@@ -207,7 +209,44 @@ export function ToolExecution({
 
   return (
     <>
-      <div className="tool-request">
+      <form
+        className="tool-request"
+        onSubmit={(event) => {
+          event.preventDefault();
+          if (buttonClickIsDebounced()) return;
+          try {
+            const request = JSON.parse(
+              mode === "form"
+                ? JSON.stringify({ tool: tool.name, args: formValues })
+                : rawRequest,
+            ) as ToolCall;
+            if (
+              typeof request.tool !== "string" ||
+              !Object.prototype.hasOwnProperty.call(request, "args")
+            ) {
+              throw new Error('JSON must include "tool" and "args".');
+            }
+            setRequestError("");
+            dispatch({ type: ActionType.RUN, call: request });
+            onToolRun?.();
+          } catch (error) {
+            if (error instanceof SyntaxError) {
+              setRequestError("");
+              dispatch({
+                type: ActionType.RUN,
+                call: { tool: tool.name, args: rawRequest },
+              });
+              onToolRun?.();
+              return;
+            }
+            setRequestError(
+              error instanceof Error
+                ? error.message
+                : "Could not send request.",
+            );
+          }
+        }}
+      >
         <div className="tool-request-heading">
           <strong>{tool.name}</strong>
         </div>
@@ -314,49 +353,28 @@ export function ToolExecution({
           </p>
         )}
         <button
+          type="submit"
           disabled={disabled}
           id="tool-run"
           className="action-button send-button"
-          onClick={() => {
-            if (buttonClickIsDebounced()) return;
-            try {
-              const request = JSON.parse(
-                mode === "form"
-                  ? JSON.stringify({ tool: tool.name, args: formValues })
-                  : rawRequest,
-              ) as ToolCall;
-              if (
-                typeof request.tool !== "string" ||
-                !Object.prototype.hasOwnProperty.call(request, "args")
-              ) {
-                throw new Error('JSON must include "tool" and "args".');
-              }
-              setRequestError("");
-              dispatch({ type: ActionType.RUN, call: request });
-              onToolRun?.();
-            } catch (error) {
-              if (error instanceof SyntaxError) {
-                setRequestError("");
-                dispatch({
-                  type: ActionType.RUN,
-                  call: { tool: tool.name, args: rawRequest },
-                });
-                onToolRun?.();
-                return;
-              }
-              setRequestError(
-                error instanceof Error
-                  ? error.message
-                  : "Could not send request.",
-              );
-            }
-          }}
         >
           Send request
         </button>
-      </div>
+      </form>
 
-      <div className="answer-section">
+      <form
+        className="answer-section"
+        onSubmit={(event) => {
+          event.preventDefault();
+          if (buttonClickIsDebounced()) return;
+          if (!answer.trim()) {
+            if (answerInputRef.current) onEmptyAnswer?.(answerInputRef.current);
+            return;
+          }
+          dispatch({ type: ActionType.ANSWER, text: answer });
+          onAnswer?.(answer);
+        }}
+      >
         <label className="request-label" htmlFor="answer-input">
           Respond to user
         </label>
@@ -365,26 +383,19 @@ export function ToolExecution({
           disabled={disabled}
           id="answer-input"
           className="composer-input"
+          onFocus={(event) => onAnswerFocus?.(event.currentTarget)}
           value={answer}
           onChange={(event) => setAnswer(event.target.value)}
           placeholder="write your response"
         />
         <button
+          type="submit"
           disabled={disabled}
           className="action-button"
-          onClick={() => {
-            if (buttonClickIsDebounced()) return;
-            if (!answer.trim()) {
-              if (answerInputRef.current) onEmptyAnswer?.(answerInputRef.current);
-              return;
-            }
-            dispatch({ type: ActionType.ANSWER, text: answer });
-            onAnswer?.(answer);
-          }}
         >
           Send response
         </button>
-      </div>
+      </form>
     </>
   );
 }

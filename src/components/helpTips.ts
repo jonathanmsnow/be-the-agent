@@ -11,6 +11,7 @@ export type TipDefinition = {
   body: string;
   targetId?: string;
   fallbackTargetId?: string;
+  initialDelayMs?: number;
   trigger?: (context: TipTriggerContext) => boolean;
   scenarioId?: string | null;
 };
@@ -19,7 +20,7 @@ export const TIP_DEFINITIONS: TipDefinition[] = [
   {
     id: "tool-call-prompt",
     label: "Call a tool",
-    title: "Ready to call a tool?",
+    title: "Using Tools as an Agent",
     body: "Choose a tool, run it, and use the results to move the investigation forward.",
     targetId: "tool-run",
     trigger: ({ elapsedMs, toolRunCount }) =>
@@ -46,8 +47,8 @@ export const TIP_DEFINITIONS: TipDefinition[] = [
   {
     id: "tool-result",
     label: "Read tool results",
-    title: "Read tool results",
-    body: "This is what the agent sees next. Decide: call another tool, or reply to the user.",
+    title: "Tool Call Result Output",
+    body: "When you are acting as the agent and make a tool call, you will see the result here. Tools help you gather information and perform actions to solve the user's request.",
     targetId: "tool-result",
     fallbackTargetId: "tool-run",
     scenarioId: null,
@@ -55,18 +56,20 @@ export const TIP_DEFINITIONS: TipDefinition[] = [
   {
     id: "answer-required",
     label: "Answer the user",
-    title: "Provide a response to the user",
-    body: "Write a response to the user before hitting send. The user will respond to let you know if your response solved their issue.",
+    title: "Responding to the User",
+    body: "This is how you send a response to the user to answer their request. The user will respond to let you know if you provided the correct information.",
     targetId: "answer-input",
     scenarioId: null,
   },
   {
     id: "original-user-request",
     label: "Read the user's request",
-    title: "This is the task to solve",
+    title: "User Prompts and Requests",
     body: "This is what the user wants you to accomplish. Use this original user request to guide your investigation and response.",
     targetId: "original-user-request",
-    trigger: ({ wrongAnswer }) => wrongAnswer === true,
+    initialDelayMs: 0,
+    trigger: ({ elapsedMs, wrongAnswer }) =>
+      wrongAnswer === true || elapsedMs >= 0,
     scenarioId: null,
   },
 ];

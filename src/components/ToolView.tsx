@@ -11,6 +11,7 @@ export function ToolView({
   onViewRangeFocus,
   onModeSwitch,
   onToolRun,
+  onAnswerFocus,
   onEmptyAnswer,
   onAnswer,
 }: {
@@ -20,6 +21,7 @@ export function ToolView({
   onViewRangeFocus?: (anchor: HTMLElement) => void;
   onModeSwitch?: (anchor: HTMLElement) => void;
   onToolRun?: () => void;
+  onAnswerFocus?: (anchor: HTMLElement) => void;
   onEmptyAnswer?: (anchor: HTMLElement) => void;
   onAnswer?: (text: string) => void;
 }) {
@@ -52,6 +54,7 @@ export function ToolView({
         onViewRangeFocus={onViewRangeFocus}
         onModeSwitch={onModeSwitch}
         onToolRun={onToolRun}
+        onAnswerFocus={onAnswerFocus}
         onEmptyAnswer={onEmptyAnswer}
         onAnswer={onAnswer}
       />

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 export function HelpTip({
@@ -19,9 +19,10 @@ export function HelpTip({
     left: 0,
     placement: "below" as "above" | "below",
   });
+  const [positioned, setPositioned] = useState(false);
   const tipRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const updatePosition = () => {
       const rect = anchor.getBoundingClientRect();
       const tipHeight = tipRef.current?.offsetHeight ?? 90;
@@ -35,34 +36,25 @@ export function HelpTip({
         ),
         placement: below ? "below" : "above",
       });
+      setPositioned(true);
     };
-    const frame = requestAnimationFrame(updatePosition);
+    updatePosition();
     window.addEventListener("resize", updatePosition);
     window.addEventListener("scroll", updatePosition, true);
     return () => {
-      cancelAnimationFrame(frame);
       window.removeEventListener("resize", updatePosition);
       window.removeEventListener("scroll", updatePosition, true);
     };
   }, [anchor]);
 
-  // Handle closing the help tip when clicking outside or pressing Escape
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
     };
-    const onPointerDown = (event: PointerEvent) => {
-      const target = event.target as Node;
-      if (!tipRef.current?.contains(target) && !anchor.contains(target)) {
-        onClose();
-      }
-    };
     document.addEventListener("keydown", onKeyDown);
-    document.addEventListener("pointerdown", onPointerDown);
     tipRef.current?.focus();
     return () => {
       document.removeEventListener("keydown", onKeyDown);
-      document.removeEventListener("pointerdown", onPointerDown);
     };
   }, [anchor, onClose]);
 
@@ -72,7 +64,11 @@ export function HelpTip({
       className={`help-tip ${position.placement}`}
       role="status"
       tabIndex={-1}
-      style={{ top: position.top, left: position.left }}
+      style={{
+        top: position.top,
+        left: position.left,
+        visibility: positioned ? "visible" : "hidden",
+      }}
     >
       <span className="help-tip-arrow" aria-hidden="true" />
       <div className="help-tip-content">

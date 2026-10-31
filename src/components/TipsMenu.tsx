@@ -65,7 +65,7 @@ export function TipsMenu({
               className="tips-item"
               onClick={(event) => onShowTip(tip, event.currentTarget)}
             >
-              {tip.label}
+              {tip.title}
             </button>
           </li>
         ))}

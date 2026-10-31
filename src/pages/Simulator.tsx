@@ -84,10 +84,12 @@ export function Simulator({
   const [completionDismissed, setCompletionDismissed] = useState(false);
   const [seenTips, setSeenTips] = useState(() => readSeen());
   const seenTipsRef = useRef(seenTips);
-  const [activeTip, setActiveTip] = useState<{
-    id: string;
-    anchor: HTMLElement;
-  } | null>(null);
+  const [activeTips, setActiveTips] = useState<
+    Array<{
+      id: string;
+      anchor: HTMLElement;
+    }>
+  >([]);
   const [tipsAnchor, setTipsAnchor] = useState<HTMLElement | null>(null);
   const [activityVersion, setActivityVersion] = useState(0);
   const [idleTipAttempt, setIdleTipAttempt] = useState(0);
@@ -127,15 +129,21 @@ export function Simulator({
       if (
         !tip ||
         !anchor ||
-        (!force && (activeTip || seenTips.has(tip.id))) ||
+        (!force &&
+          (activeTips.some((active) => active.id === tip.id) ||
+            seenTips.has(tip.id))) ||
         !isVisible(anchor)
       ) {
         return;
       }
       setTipsAnchor(null);
-      setActiveTip({ id: tip.id, anchor });
+      setActiveTips((current) =>
+        current.some((active) => active.id === tip.id)
+          ? current
+          : [...current, { id: tip.id, anchor }],
+      );
     },
-    [activeTip, seenTips, scenarioTips],
+    [activeTips, seenTips, scenarioTips],
   );
   const openTipRef = useRef(openTip);
 
@@ -162,7 +170,7 @@ export function Simulator({
     const nextSeen = new Set(seenTips).add(id);
     setSeenTips(nextSeen);
     writeSeen(nextSeen);
-    setActiveTip(null);
+    setActiveTips((current) => current.filter((tip) => tip.id !== id));
   };
 
   const markToolRun = () => {
@@ -194,7 +202,11 @@ export function Simulator({
     if (!request || seenTips.has("original-user-request")) return;
     window.setTimeout(() => {
       setTipsAnchor(null);
-      setActiveTip({ id: "original-user-request", anchor: request });
+      setActiveTips((current) =>
+        current.some((tip) => tip.id === "original-user-request")
+          ? current
+          : [...current, { id: "original-user-request", anchor: request }],
+      );
     }, 100);
   };
 
@@ -219,19 +231,34 @@ export function Simulator({
   }, [state.log.length]);
 
   useEffect(() => {
+    const tip = tipForTarget(scenarioTips, "original-user-request");
+    if (!tip || tip.initialDelayMs === undefined) return;
+    const delay = tip.initialDelayMs;
+
     const tipTimer = window.setTimeout(() => {
       const request = scrollToOriginalRequest();
-      if (!request || seenTipsRef.current.has("original-user-request")) {
+      if (
+        !request ||
+        seenTipsRef.current.has("original-user-request") ||
+        !shouldTriggerTip(tip, {
+          elapsedMs: delay,
+          toolRunCount: toolRunCountRef.current,
+        })
+      ) {
         return;
       }
-      setActiveTip({ id: "original-user-request", anchor: request });
-    }, 15_000);
+      setActiveTips((current) =>
+        current.some((tip) => tip.id === "original-user-request")
+          ? current
+          : [...current, { id: "original-user-request", anchor: request }],
+      );
+    }, delay);
     return () => window.clearTimeout(tipTimer);
-  }, [scenarioData.id]);
+  }, [scenarioData.id, scenarioTips]);
 
   useEffect(() => {
     if (
-      activeTip ||
+      activeTips.length > 0 ||
       toolRunCountRef.current > 0 ||
       seenTips.has("tool-call-prompt")
     ) {
@@ -259,7 +286,7 @@ export function Simulator({
       }
     }, delay);
     return () => window.clearTimeout(timer);
-  }, [activeTip, activityVersion, idleTipAttempt, scenarioData.id, seenTips]);
+  }, [activeTips, activityVersion, idleTipAttempt, scenarioData.id, seenTips]);
 
   const resizeFromPointer = (clientX: number) => {
     const bounds = simulatorRef.current?.getBoundingClientRect();
@@ -307,7 +334,7 @@ export function Simulator({
             aria-haspopup="dialog"
             aria-expanded={tipsAnchor !== null}
             onClick={(event) => {
-              setActiveTip(null);
+              setActiveTips([]);
               setTipsAnchor(event.currentTarget);
             }}
           >
@@ -323,6 +350,7 @@ export function Simulator({
           disabled={compactionRequired}
           onViewRangeFocus={(anchor) => showTip("view-range", anchor)}
           onModeSwitch={(anchor) => showTip("request-mode", anchor)}
+          onAnswerFocus={(anchor) => showTip("answer-required", anchor)}
           onEmptyAnswer={(anchor) => openTip("answer-required", anchor, true)}
           onAnswer={remindOriginalRequestAfterWrongAnswer}
           onToolRun={() => {
@@ -420,17 +448,24 @@ export function Simulator({
           </section>
         </div>
       )}
-      {activeTip && (
-        <HelpTip
-          anchor={activeTip.anchor}
-          title={
-            scenarioTips.find((tip) => tip.id === activeTip.id)?.title ?? ""
-          }
-          body={scenarioTips.find((tip) => tip.id === activeTip.id)?.body ?? ""}
-          onClose={() => setActiveTip(null)}
-          onStopReminding={() => stopReminding(activeTip.id)}
-        />
-      )}
+      {activeTips.map((activeTip) => {
+        const tip = scenarioTips.find((candidate) => candidate.id === activeTip.id);
+        if (!tip) return null;
+        return (
+          <HelpTip
+            key={activeTip.id}
+            anchor={activeTip.anchor}
+            title={tip.title}
+            body={tip.body}
+            onClose={() =>
+              setActiveTips((current) =>
+                current.filter((active) => active.id !== activeTip.id),
+              )
+            }
+            onStopReminding={() => stopReminding(activeTip.id)}
+          />
+        );
+      })}
       {tipsAnchor && (
         <TipsMenu
           anchor={tipsAnchor}
