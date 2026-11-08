@@ -1,20 +1,31 @@
 import { Link } from "./Link";
 
-interface ResourceLink {
+export interface ResourceLink {
   label: string;
   href: string;
 }
 
-interface Resource {
+export interface ResourceImage {
+  src: string;
+  alt: string;
+  caption?: string;
+  attribution?: {
+    label: string;
+    href: string;
+  };
+}
+
+export interface Resource {
   title: string;
   description?: string;
   links: ResourceLink[];
 }
 
-interface ResourceTopic {
+export interface ResourceTopic {
   title: string;
   description?: string;
   resources?: Resource[];
+  image?: ResourceImage;
 }
 
 export interface ResourceSectionData {

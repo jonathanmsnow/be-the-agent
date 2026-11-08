@@ -13,6 +13,7 @@ export function HelpTip({
   body,
   learnMoreUrl,
   learnMoreLabel = "Learn more",
+  onLearnMore,
   persistent = false,
   hoverOnly = false,
   contextual = false,
@@ -24,6 +25,7 @@ export function HelpTip({
   body: string;
   learnMoreUrl?: string;
   learnMoreLabel?: string;
+  onLearnMore?: () => void;
   persistent?: boolean;
   hoverOnly?: boolean;
   contextual?: boolean;
@@ -137,16 +139,25 @@ export function HelpTip({
       <div className="help-tip-content">
         <strong className="help-tip-title">{title}</strong>
         <span>{body}</span>
-        {learnMoreUrl && (
-          <a
-            href={learnMoreUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="help-tip-link"
-          >
-            {learnMoreLabel}
-          </a>
-        )}
+        {learnMoreUrl &&
+          (onLearnMore ? (
+            <button
+              type="button"
+              className="help-tip-link help-tip-link-button"
+              onClick={onLearnMore}
+            >
+              {learnMoreLabel}
+            </button>
+          ) : (
+            <a
+              href={learnMoreUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="help-tip-link"
+            >
+              {learnMoreLabel}
+            </a>
+          ))}
         {!contextual && (
           <button
             type="button"

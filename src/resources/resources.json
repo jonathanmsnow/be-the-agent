@@ -74,6 +74,15 @@
       {
         "title": "Context Management",
         "description": "Learn how agents manage and utilize context to make informed decisions.",
+        "image": {
+          "src": "https://haystack.deepset.ai/blog/context-engineering/context-growth.png",
+          "alt": "Diagram showing how an agent's context window grows over time.",
+          "caption": "Context window growth over time.",
+          "attribution": {
+            "label": "Haystack by deepset: Context Engineering",
+            "href": "https://haystack.deepset.ai/blog/context-engineering"
+          }
+        },
         "resources": [
           {
             "title": "Context Window (Stanford HAI)",

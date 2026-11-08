@@ -42,6 +42,29 @@ export function LandingPage({
           />
         </div>
       </section>
+      <section
+        className="assessment-prompt"
+        aria-labelledby="assessment-heading"
+      >
+        <div className="assessment-prompt-content">
+          <div className="eyebrow">START HERE</div>
+          <h1 id="assessment-heading">Take the pre-assessment</h1>
+          <p>
+            Help us understand how effective "Be The Agent" is by completing a
+            short diagnostic assessment before you begin.
+          </p>
+        </div>
+        <div className="assessment-prompt-actions">
+          <a
+            className="assessment-button"
+            href="https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=u5ghSHuuJUuLem1_Mvqgg83cgJRvn8ZBjbFo9mhnAv9UMVJHSDNNOFlZS0hMQjVFWTVUWjk5UDdYMC4u"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Fill out pre-assessment <span aria-hidden="true">→</span>
+          </a>
+        </div>
+      </section>
       <section className="scenario-section" aria-labelledby="missions-heading">
         <div className="section-heading">
           <div>

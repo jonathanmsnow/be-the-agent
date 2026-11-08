@@ -20,6 +20,8 @@ import {
 import { ContextIndicator } from "../components/ContextTracker";
 import { ToolView } from "../components/ToolView";
 import { SummaryPrompt } from "../components/SummaryPrompt";
+import { ResourceExperience } from "../components/ResourceExperience";
+import type { ResourceTopic } from "../components/ResourceSection";
 import { ROLE, type Scenario } from "../engine/types";
 import {
   TOOL_REGISTRY,
@@ -27,6 +29,7 @@ import {
 } from "../tools/toolRegistry";
 import { calculateTokens } from "../utils";
 import { reducer, type Action, type State } from "./reducer";
+import resources from "../resources/resources.json";
 
 const TOOL_CALL_TIP_INITIAL_DELAY_MS = 30_000;
 const TOOL_CALL_TIP_MAX_DELAY_MS = 5 * 60_000;
@@ -93,6 +96,7 @@ export function Simulator({
     }>
   >([]);
   const [tipsAnchor, setTipsAnchor] = useState<HTMLElement | null>(null);
+  const [resourceTipId, setResourceTipId] = useState<string | null>(null);
   const [activityVersion, setActivityVersion] = useState(0);
   const [idleTipAttempt, setIdleTipAttempt] = useState(0);
   const simulatorRef = useRef<HTMLDivElement>(null);
@@ -116,6 +120,14 @@ export function Simulator({
     () => tipsForScenario(scenarioData.id),
     [scenarioData.id],
   );
+  const resourceTopicForTip = (topicTitle: string): ResourceTopic | null => {
+    const section = Object.values(resources).find((candidate) =>
+      candidate.topics.some((topic) => topic.title === topicTitle),
+    );
+    return (
+      section?.topics.find((topic) => topic.title === topicTitle) ?? null
+    );
+  };
   const openTip = useCallback(
     (
       targetId: string,
@@ -517,12 +529,13 @@ export function Simulator({
             key={activeTip.id}
             anchor={activeTip.anchor}
             title={tip.title}
-            body={tip.body}
+            body={tip.hoverBody}
             learnMoreUrl={tip.learnMoreUrl}
             learnMoreLabel={tip.learnMoreLabel}
             persistent={activeTip.persistent}
             hoverOnly={activeTip.hoverOnly}
             contextual={tip.contextual}
+            onLearnMore={() => setResourceTipId(tip.id)}
             onClose={() =>
               setActiveTips((current) =>
                 current.filter((active) => active.id !== activeTip.id),
@@ -532,6 +545,25 @@ export function Simulator({
           />
         );
       })}
+      {resourceTipId &&
+        (() => {
+          const tip = scenarioTips.find(
+            (candidate) => candidate.id === resourceTipId,
+          );
+          const topic = tip?.resourceTopic
+            ? resourceTopicForTip(tip.resourceTopic)
+            : null;
+          if (!tip || !topic) return null;
+          return (
+            <ResourceExperience
+              title={tip.title}
+              body={tip.modalBody ?? tip.hoverBody}
+              topic={topic}
+              image={tip.modalImage}
+              onClose={() => setResourceTipId(null)}
+            />
+          );
+        })()}
       {tipsAnchor && (
         <TipsMenu
           anchor={tipsAnchor}
