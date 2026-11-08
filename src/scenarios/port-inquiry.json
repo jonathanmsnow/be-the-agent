@@ -1,5 +1,5 @@
 {
-  "id": "scenario1",
+  "id": "port-inquiry",
   "title": "Server Port Inquiry",
   "difficulty": 1,
   "description": "Help the operations team identify the port number that the server is listening on by making tool calls.",
