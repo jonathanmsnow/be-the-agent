@@ -3,8 +3,8 @@ import { Card } from "../components/Card";
 import { ScenarioCard } from "../components/ScenarioCard";
 import { scenarios } from "../scenarios/scenarios";
 import type { Scenario } from "../engine/types";
-import { ResourceSection } from "../components/ResourceSection";
-import resources from "../resources/resources.json";
+import { ResourceContent } from "../components/ResourceContent";
+import { resourceSections } from "../resources/resourceData";
 
 export function LandingPage({
   setSelectedScenario,
@@ -94,8 +94,8 @@ export function LandingPage({
             <h2 id="resources-heading">Resources</h2>
           </div>
         </div>
-        {Object.entries(resources).map(([sectionId, section]) => (
-          <ResourceSection key={sectionId} section={section} />
+        {Object.entries(resourceSections).map(([sectionId, section]) => (
+          <ResourceContent key={sectionId} section={section} />
         ))}
       </section>
     </main>

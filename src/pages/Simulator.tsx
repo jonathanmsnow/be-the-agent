@@ -21,7 +21,10 @@ import { ContextIndicator } from "../components/ContextTracker";
 import { ToolView } from "../components/ToolView";
 import { SummaryPrompt } from "../components/SummaryPrompt";
 import { ResourceExperience } from "../components/ResourceExperience";
-import type { ResourceTopic } from "../components/ResourceSection";
+import {
+  resourceLinkForId,
+  resourceTopicForId,
+} from "../resources/resourceData";
 import { ROLE, type Scenario } from "../engine/types";
 import {
   TOOL_REGISTRY,
@@ -29,7 +32,6 @@ import {
 } from "../tools/toolRegistry";
 import { calculateTokens } from "../utils";
 import { reducer, type Action, type State } from "./reducer";
-import resources from "../resources/resources.json";
 
 const TOOL_CALL_TIP_INITIAL_DELAY_MS = 30_000;
 const TOOL_CALL_TIP_MAX_DELAY_MS = 5 * 60_000;
@@ -120,14 +122,6 @@ export function Simulator({
     () => tipsForScenario(scenarioData.id),
     [scenarioData.id],
   );
-  const resourceTopicForTip = (topicTitle: string): ResourceTopic | null => {
-    const section = Object.values(resources).find((candidate) =>
-      candidate.topics.some((topic) => topic.title === topicTitle),
-    );
-    return (
-      section?.topics.find((topic) => topic.title === topicTitle) ?? null
-    );
-  };
   const openTip = useCallback(
     (
       targetId: string,
@@ -530,8 +524,11 @@ export function Simulator({
             anchor={activeTip.anchor}
             title={tip.title}
             body={tip.hoverBody}
-            learnMoreUrl={tip.learnMoreUrl}
-            learnMoreLabel={tip.learnMoreLabel}
+            learnMoreUrl={
+              tip.resourceId
+                ? resourceLinkForId(tip.resourceId)?.href
+                : undefined
+            }
             persistent={activeTip.persistent}
             hoverOnly={activeTip.hoverOnly}
             contextual={tip.contextual}
@@ -550,16 +547,15 @@ export function Simulator({
           const tip = scenarioTips.find(
             (candidate) => candidate.id === resourceTipId,
           );
-          const topic = tip?.resourceTopic
-            ? resourceTopicForTip(tip.resourceTopic)
+          const topic = tip?.resourceId
+            ? resourceTopicForId(tip.resourceId)
             : null;
           if (!tip || !topic) return null;
           return (
             <ResourceExperience
               title={tip.title}
-              body={tip.modalBody ?? tip.hoverBody}
+              body={tip.hoverBody}
               topic={topic}
-              image={tip.modalImage}
               onClose={() => setResourceTipId(null)}
             />
           );

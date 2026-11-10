@@ -39,10 +39,11 @@
               }
             ]
           }
-        ]
+        ],
+        "id": "agent-concepts"
       },
       {
-        "title": "Tool Calling",
+        "title": "What is Tool Calling?",
         "description": "Agents can use tools to interact with their environment and other systems, enabling them to perform complex tasks.",
         "resources": [
           {
@@ -69,10 +70,11 @@
               }
             ]
           }
-        ]
+        ],
+        "id": "tool-calling"
       },
       {
-        "title": "Context Management",
+        "title": "What is Context Management?",
         "description": "Learn how agents manage and utilize context to make informed decisions.",
         "image": {
           "src": "https://haystack.deepset.ai/blog/context-engineering/context-growth.png",
@@ -115,6 +117,33 @@
               {
                 "label": "Read (5 min)",
                 "href": "https://docs.github.com/en/copilot/concepts/prompting-and-context/context-management#compaction"
+              }
+            ]
+          }
+        ],
+        "id": "context-management"
+      },
+      {
+        "id": "tokens",
+        "title": "What are Tokens?",
+        "description": "Tokens are small pieces of text that make up an AI model's context. Models process text as tokens rather than whole words, and token counts show how much context is being used.",
+        "image": {
+          "src": "/images/tokenization-comparison.png",
+          "alt": "Comparison of how GPT-2, BERT, and T5 split the sentence The quick brown fox jumps over the lazy dog. Token counts and vocabulary sizes differ by tokenizer.",
+          "caption": "The same sentence can be divided into different tokens by different models.",
+          "attribution": {
+            "label": "Context Lab tokenization demo",
+            "href": "https://context-lab.com/llm-course/demos/tokenization/"
+          }
+        },
+        "resources": [
+          {
+            "title": "Understanding tokens (Microsoft)",
+            "description": "Learn how token counts relate to model context.",
+            "links": [
+              {
+                "label": "Read",
+                "href": "https://learn.microsoft.com/en-us/dotnet/ai/conceptual/understanding-tokens"
               }
             ]
           }

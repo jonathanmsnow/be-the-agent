@@ -1,9 +1,6 @@
 import { useEffect, useRef } from "react";
-import {
-  ResourceSection,
-  type ResourceImage,
-  type ResourceTopic,
-} from "./ResourceSection";
+import { ResourceContent } from "./ResourceContent";
+import type { ResourceImage, ResourceTopic } from "../resources/resourceData";
 
 export function ResourceExperience({
   title,
@@ -41,13 +38,10 @@ export function ResourceExperience({
         className="resource-experience-modal"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="resource-experience-title"
+        aria-label={title}
       >
         <div className="resource-experience-header">
-          <div>
-            <div className="eyebrow">LEARN IN CONTEXT</div>
-            <h2 id="resource-experience-title">{title}</h2>
-          </div>
+          <div className="eyebrow">LEARN IN CONTEXT</div>
           <button
             ref={closeButtonRef}
             type="button"
@@ -57,34 +51,13 @@ export function ResourceExperience({
             <span className="sr-only">Close resource</span>×
           </button>
         </div>
-        <p className="resource-experience-body">{body}</p>
-        {(image ?? topic.image) && (
-          <figure className="resource-experience-figure">
-            <img
-              src={(image ?? topic.image)!.src}
-              alt={(image ?? topic.image)!.alt}
-            />
-            {(image ?? topic.image)!.caption && (
-              <figcaption>{(image ?? topic.image)!.caption}</figcaption>
-            )}
-            {(image ?? topic.image)!.attribution && (
-              <figcaption>
-                Image:{" "}
-                <a
-                  href={(image ?? topic.image)!.attribution!.href}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {(image ?? topic.image)!.attribution!.label}
-                </a>
-              </figcaption>
-            )}
-          </figure>
-        )}
-        <ResourceSection
+        <ResourceContent
           section={{
-            topics: [topic],
+            topics: [image ? { ...topic, image } : topic],
           }}
+          title={title}
+          intro={body}
+          collapsible={false}
         />
       </section>
     </div>

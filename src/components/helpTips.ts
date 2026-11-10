@@ -1,5 +1,3 @@
-import type { ResourceImage } from "./ResourceSection";
-
 export type TipTriggerContext = {
   elapsedMs: number;
   toolRunCount: number;
@@ -11,11 +9,7 @@ export type TipDefinition = {
   label: string;
   title: string;
   hoverBody: string;
-  modalBody?: string;
-  modalImage?: ResourceImage;
-  learnMoreUrl?: string;
-  learnMoreLabel?: string;
-  resourceTopic?: string;
+  resourceId?: string;
   hoverOnly?: boolean;
   contextual?: boolean;
   targetId?: string;
@@ -32,22 +26,8 @@ export const TIP_DEFINITIONS: TipDefinition[] = [
     title: "Tokens",
     hoverBody:
       "Tokens are small pieces of text that make up an AI model's context.",
-    modalBody:
-      "Models process text as tokens rather than whole words. Token counts help you see how much of the available context is being used by instructions, requests, tool calls, and results.",
-    modalImage: {
-      src: "/images/tokenization-comparison.png",
-      alt: "Comparison of how GPT-2, BERT, and T5 split the sentence The quick brown fox jumps over the lazy dog. Token counts and vocabulary sizes differ by tokenizer.",
-      caption:
-        "The same sentence can be divided into different tokens by different models.",
-      attribution: {
-        label: "Context Lab tokenization demo",
-        href: "https://context-lab.com/llm-course/demos/tokenization/",
-      },
-    },
+    resourceId: "tokens",
     targetId: "tokens-help",
-    learnMoreUrl:
-      "https://learn.microsoft.com/en-us/dotnet/ai/conceptual/understanding-tokens",
-    resourceTopic: "Context Management",
     hoverOnly: true,
     contextual: true,
     scenarioId: null,
@@ -57,10 +37,7 @@ export const TIP_DEFINITIONS: TipDefinition[] = [
     label: "Tools",
     title: "Agent Tools",
     hoverBody: "Tools let an agent inspect context and take actions.",
-    modalBody:
-      "Tool calling lets an agent move beyond conversation. The agent chooses a tool, supplies structured input, interprets the result, and uses that evidence to decide what to do next.",
-    learnMoreUrl: "https://www.ibm.com/think/topics/tool-calling",
-    resourceTopic: "Tool Calling",
+    resourceId: "tool-calling",
     targetId: "tools-help",
     hoverOnly: true,
     contextual: true,
@@ -72,11 +49,7 @@ export const TIP_DEFINITIONS: TipDefinition[] = [
     title: "Context Window",
     hoverBody:
       "The Context Window is the amount of input (like text) that an AI system can process at one time during a task.",
-    modalBody:
-      "A context window is the model's working memory for one task. It holds instructions, conversation, tool calls, and results. As the window fills, older or less useful information may need to be compacted or removed.",
-    learnMoreUrl:
-      "https://docs.github.com/en/copilot/concepts/prompting-and-context/context-management",
-    resourceTopic: "Context Management",
+    resourceId: "context-management",
     hoverOnly: true,
     contextual: true,
     targetId: "context-window-help",

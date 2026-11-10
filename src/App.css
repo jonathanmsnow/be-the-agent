@@ -274,14 +274,73 @@
 
 .resource-topic {
   margin-top: 24px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--code-bg);
 }
 
-.resource-topic h3 {
-  margin-bottom: 8px;
+.resource-topic summary {
+  padding: 14px 16px;
+  color: var(--text-h);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.resource-topic summary::marker {
+  color: var(--accent);
+}
+
+.resource-topic-content {
+  padding: 0 16px 16px;
 }
 
 .resource-topic p {
   max-width: 680px;
+}
+
+.resource-content-intro {
+  max-width: 60ch;
+  margin: 16px 0 24px;
+  color: var(--text);
+  line-height: 1.6;
+}
+
+.resource-topic-expanded {
+  margin-top: 24px;
+}
+
+.resource-topic-expanded h3 {
+  margin-bottom: 8px;
+  color: var(--text-h);
+}
+
+.resource-topic h4 {
+  margin: 20px 0 8px;
+  color: var(--text-h);
+  font-size: 13px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.resource-figure {
+  margin: 18px 0;
+}
+
+.resource-figure img {
+  display: block;
+  width: 100%;
+  max-height: 320px;
+  object-fit: contain;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+}
+
+.resource-figure figcaption {
+  margin-top: 8px;
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.4;
 }
 
 .resource-links {
@@ -615,33 +674,7 @@
   color: var(--text-h);
 }
 
-.resource-experience-body {
-  max-width: 60ch;
-  margin: 16px 0 24px;
-  color: var(--text);
-  line-height: 1.6;
-}
 
-.resource-experience-figure {
-  margin: 0 0 24px;
-}
-
-.resource-experience-figure img {
-  display: block;
-  width: 100%;
-  max-height: 320px;
-  object-fit: contain;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--code-bg);
-}
-
-.resource-experience-figure figcaption {
-  margin-top: 8px;
-  color: var(--text);
-  font-size: 13px;
-  line-height: 1.4;
-}
 
 .tips-menu {
   display: block;
