@@ -1,12 +1,13 @@
 import type { ToolDef } from "../engine/types";
 import { listFiles } from "./listFiles";
 import { readFile } from "./readFile";
+import { editFile } from "./editFile";
 import { z } from "zod";
 
 export const TOOL_REGISTRY: Record<
   string,
   ToolDef<z.ZodObject<any>>
-> = Object.fromEntries([readFile, listFiles].map((t) => [t.name, t]));
+> = Object.fromEntries([readFile, listFiles, editFile].map((t) => [t.name, t]));
 
 export const prettyPrintToolRegistry = () => {
   return JSON.stringify(

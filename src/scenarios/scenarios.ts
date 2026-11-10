@@ -1,8 +1,14 @@
 import type { Scenario } from "../engine/types";
 import portInquiry from "./port-inquiry.json";
 import contextCompaction from "./context-compaction.json";
+import guardrailUpdate from "./guardrail-update.json";
 
 const workspaceFiles = import.meta.glob("./workspaces/**/*", {
+  eager: true,
+  import: "default",
+  query: "?raw",
+}) as Record<string, string>;
+const hiddenWorkspaceFiles = import.meta.glob("./workspaces/**/.*", {
   eager: true,
   import: "default",
   query: "?raw",
@@ -11,7 +17,7 @@ const workspaceFiles = import.meta.glob("./workspaces/**/*", {
 function filesForScenario(id: string): Record<string, { content: string }> {
   const prefix = `./workspaces/${id}/`;
   return Object.fromEntries(
-    Object.entries(workspaceFiles)
+    Object.entries({ ...workspaceFiles, ...hiddenWorkspaceFiles })
       .filter(([path]) => path.startsWith(prefix))
       .map(([path, content]) => [path.slice(prefix.length), { content }]),
   );
@@ -27,7 +33,11 @@ function scenarioDifficulty(value: number): Scenario["difficulty"] {
 }
 
 // export array of json scenario files that are loaded in
-export const scenarios: Scenario[] = [portInquiry, contextCompaction].map(
+export const scenarios: Scenario[] = [
+  portInquiry,
+  contextCompaction,
+  guardrailUpdate,
+].map(
   (scenario) => ({
     ...scenario,
     files: filesForScenario(scenario.id),

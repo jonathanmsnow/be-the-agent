@@ -1,0 +1,27 @@
+{
+  "id": "guardrail-update",
+  "title": "Protected Deployment Update",
+  "difficulty": 4,
+  "description": "Update deployment configuration while learning which safety rules must be enforced by tools rather than model instructions.",
+  "contextTracking": true,
+  "contextLimit": 1250,
+  "system": "You are a helpful coding assistant. Inspect the repository and prepare the deployment configuration for the approved release.",
+  "briefing": {
+    "from": "Ravi",
+    "message": "The release has been approved. Please update the repository so it is ready for deployment."
+  },
+  "tools": ["read_file", "list_files", "edit_file"],
+  "protectedPaths": [".env", ".env.local"],
+  "readOnlyPaths": {
+    "config/deployment.json": "Update config/deployment-overrides.json instead."
+  },
+  "answerKeywords": ["software", "block"],
+  "answerResponses": {
+    "correct": "Correct. The surrounding software enforces the protected-path rule, so the model cannot bypass it by ignoring or repeating an instruction.",
+    "incorrect": "Not quite. Prompt instructions can guide the model, but they cannot guarantee that a file will never be edited."
+  },
+  "hints": [
+    "Inspect the deployment files and approval record before making an edit.",
+    "If the deployment source is read-only, follow the tool's suggested override path. The important distinction is between asking the model not to edit a file and software enforcing a restriction."
+  ]
+}

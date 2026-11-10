@@ -44,7 +44,10 @@ export class VirtualFileSystem {
 
     return [...entries.entries()]
       .sort(([left], [right]) => left.localeCompare(right))
-      .map(([entry, isDirectory]) => (isDirectory ? `${entry}/` : entry));
+      .map(([entry, isDirectory]) => {
+        const fullPath = `${prefix}${entry}`;
+        return isDirectory ? `${fullPath}/` : fullPath;
+      });
   }
 
   readFile(path: string, viewRange?: { start: number; end: number }): string {
@@ -66,5 +69,33 @@ export class VirtualFileSystem {
     const normalizedPath = normalizePath(path);
     this.files.set(normalizedPath, { content });
     return `Updated ${normalizedPath}`;
+  }
+
+  replaceInFile(path: string, find: string, replace: string): string {
+    const normalizedPath = normalizePath(path);
+    const file = this.files.get(normalizedPath);
+    if (!file) {
+      if (this.listDirectory(normalizedPath).length > 0) {
+        return `Error: ${path} is a directory`;
+      }
+      return `Error: ${path} not found`;
+    }
+
+    const matches = file.content.split(find).length - 1;
+    if (matches === 0) {
+      return `Error: edit not applied. The requested text was not found in ${path}. Read the current file before trying again.`;
+    }
+    if (matches > 1) {
+      return `Error: edit not applied. The requested text matched ${matches} locations in ${path}. Provide more surrounding text so the edit is unambiguous.`;
+    }
+
+    const content = file.content.replace(find, replace);
+    this.files.set(normalizedPath, { content });
+    return [
+      `Updated ${normalizedPath}`,
+      "",
+      `- ${find.replaceAll("\n", "\n- ")}`,
+      `+ ${replace.replaceAll("\n", "\n+ ")}`,
+    ].join("\n");
   }
 }

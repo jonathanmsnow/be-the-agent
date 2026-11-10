@@ -77,6 +77,16 @@ export const TIP_DEFINITIONS: TipDefinition[] = [
     scenarioId: null,
   },
   {
+    id: "exact-edit",
+    label: "Make a targeted edit",
+    title: "Edit One Exact Match",
+    hoverBody:
+      "Read the file first, then provide exact text to find and its replacement. The tool changes the file only when the text matches once, which prevents an ambiguous edit.",
+    targetId: "tool-run",
+    trigger: ({ toolRunCount }) => toolRunCount >= 2,
+    scenarioId: "guardrail-update",
+  },
+  {
     id: "request-mode",
     label: "Switch request views",
     title: "Switch Tool Request Views",

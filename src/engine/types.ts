@@ -10,6 +10,8 @@ export interface Scenario {
   contextTracking?: boolean;
   contextLimit?: number;
   files: Record<string, { content: string }>;
+  protectedPaths?: string[];
+  readOnlyPaths?: Record<string, string>;
   answerKeywords: string[];
   answerResponses: {
     correct: string;
