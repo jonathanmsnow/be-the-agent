@@ -32,6 +32,7 @@ import {
 } from "../tools/toolRegistry";
 import { calculateTokens } from "../utils";
 import { reducer, type Action, type State } from "./reducer";
+import { VirtualFileSystem } from "../engine/virtualFileSystem";
 
 const TOOL_CALL_TIP_INITIAL_DELAY_MS = 30_000;
 const TOOL_CALL_TIP_MAX_DELAY_MS = 5 * 60_000;
@@ -78,9 +79,10 @@ export function Simulator({
   onBack: () => void;
   onRestart: () => void;
 }) {
+  const [fileSystem] = useState(() => new VirtualFileSystem(scenarioData.files));
   const [state, dispatch] = useReducer(
     (currentState: State, action: Action) =>
-      reducer(currentState, action, scenarioData),
+      reducer(currentState, action, scenarioData, fileSystem),
     initial,
     () => createInitialState(scenarioData),
   );

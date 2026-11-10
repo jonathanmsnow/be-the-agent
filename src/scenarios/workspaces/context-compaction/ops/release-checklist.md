@@ -1,0 +1,1 @@
+Release checklist: confirm approval, check migrations, verify dashboards, announce the deployment window, and record the final status in the change system. The checklist does not define environment-specific values.

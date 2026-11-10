@@ -1,0 +1,1 @@
+Edge cache runbook: flush the cache only after confirming the change window, verify the warmer reaches all POPs, compare hit ratios before and after rollout, and check stale headers. If invalidation fails, page Platform On-call and attach the request ID. Last reviewed 2025-11-04.

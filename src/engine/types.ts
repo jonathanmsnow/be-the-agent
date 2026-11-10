@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { VirtualFileSystem } from "./virtualFileSystem";
 export interface Scenario {
   id: string;
   title: string;
@@ -60,7 +61,7 @@ export interface ToolDef<S extends z.ZodObject = z.ZodObject> {
   name: string;
   description: string;
   schema: S;
-  run(level: Scenario, args: z.infer<S>): string;
+  run(level: Scenario, args: z.infer<S>, fileSystem: VirtualFileSystem): string;
   terminal?: boolean;
 }
 

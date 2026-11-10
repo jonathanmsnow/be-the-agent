@@ -1,0 +1,1 @@
+Q3 platform retrospective: the team reduced alert noise by 18%, moved the primary pager rotation to Dublin hours, standardized dashboard names, and opened follow-ups for ownership boundaries. The next review is scheduled for Thursday. These notes are included in the repository for historical context.

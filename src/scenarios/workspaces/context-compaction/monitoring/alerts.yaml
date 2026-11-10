@@ -1,0 +1,1 @@
+Alert policy: page on sustained 5xx responses, queue depth above threshold, or failed health checks. Warning notifications route to the platform channel. Alert policy is shared across production environments.

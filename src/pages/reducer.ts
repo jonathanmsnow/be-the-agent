@@ -7,6 +7,7 @@ import {
   ROLE,
 } from "../engine/types";
 import { calculateTokens } from "../utils";
+import type { VirtualFileSystem } from "../engine/virtualFileSystem";
 
 export interface State {
   log: Entry[];
@@ -24,6 +25,7 @@ export function reducer(
   state: State,
   action: Action,
   scenarioData: Scenario,
+  fileSystem: VirtualFileSystem,
 ): State {
   switch (action.type) {
     case ActionType.RUN: {
@@ -38,6 +40,7 @@ export function reducer(
         scenarioData,
         action.call?.tool,
         action.call?.args,
+        fileSystem,
       );
       const path =
         typeof action.call?.args === "object" &&

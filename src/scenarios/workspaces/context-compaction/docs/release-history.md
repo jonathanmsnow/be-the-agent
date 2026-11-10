@@ -1,0 +1,1 @@
+Release history: 2.1 introduced the first pipeline, 2.2 changed image naming, 2.3 updated dependency pins, 2.4 changed log labels, and 2.5 refreshed dashboards. Current release candidate is 2.6.3. Rollback owner is listed in the change record.

@@ -1,0 +1,1 @@
+Repository orientation: read operational docs before changing automation. Confirm release metadata against source configuration. Keep handoff notes concise and include links to evidence where possible.

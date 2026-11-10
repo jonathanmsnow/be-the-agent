@@ -2,11 +2,13 @@ import z from "zod";
 import { TOOL_REGISTRY } from "../tools/toolRegistry";
 import type { Scenario, ToolResult } from "./types";
 import { calculateTokens } from "../utils";
+import type { VirtualFileSystem } from "./virtualFileSystem";
 
 export function runTool(
   level: Scenario,
   name: string | undefined,
   rawArgs: unknown,
+  fileSystem: VirtualFileSystem,
 ): ToolResult {
   if (!name) {
     const output = "Error: no tool specified";
@@ -35,6 +37,6 @@ export function runTool(
       cost: calculateTokens(z.prettifyError(parsed.error)),
     };
   }
-  const result = tool.run(level, parsed.data);
+  const result = tool.run(level, parsed.data, fileSystem);
   return { output: result, cost: calculateTokens(result) };
 }

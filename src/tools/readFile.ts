@@ -26,15 +26,7 @@ export const readFile = defineTool({
       .optional()
       .describe("Optional view range to limit the content returned"),
   }),
-  run(level, { path, view_range }) {
-    const f = level.files[path];
-    if (!f) {
-      return `Error: ${path} not found`;
-    }
-    if (view_range) {
-      const { start, end } = view_range;
-      return f.content.slice(start, end);
-    }
-    return f.content;
+  run(_level, { path, view_range }, fileSystem) {
+    return fileSystem.readFile(path, view_range);
   },
 });

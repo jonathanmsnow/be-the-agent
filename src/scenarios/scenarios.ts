@@ -2,6 +2,21 @@ import type { Scenario } from "../engine/types";
 import portInquiry from "./port-inquiry.json";
 import contextCompaction from "./context-compaction.json";
 
+const workspaceFiles = import.meta.glob("./workspaces/**/*", {
+  eager: true,
+  import: "default",
+  query: "?raw",
+}) as Record<string, string>;
+
+function filesForScenario(id: string): Record<string, { content: string }> {
+  const prefix = `./workspaces/${id}/`;
+  return Object.fromEntries(
+    Object.entries(workspaceFiles)
+      .filter(([path]) => path.startsWith(prefix))
+      .map(([path, content]) => [path.slice(prefix.length), { content }]),
+  );
+}
+
 function scenarioDifficulty(value: number): Scenario["difficulty"] {
   if (Number.isInteger(value) && value >= 1 && value <= 4) {
     return value as Scenario["difficulty"];
@@ -15,6 +30,7 @@ function scenarioDifficulty(value: number): Scenario["difficulty"] {
 export const scenarios: Scenario[] = [portInquiry, contextCompaction].map(
   (scenario) => ({
     ...scenario,
+    files: filesForScenario(scenario.id),
     difficulty: scenarioDifficulty(scenario.difficulty),
   }),
 );

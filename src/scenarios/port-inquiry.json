@@ -9,10 +9,6 @@
     "from": "Dana",
     "message": "What port does the server listen on? I am trying to configure the firewall and need to know the port number."
   },
-  "files": {
-    "README.md": { "content": "Nothing useful here." },
-    "config.json": { "content": "{ \"port\": 8080 }" }
-  },
   "tools": ["read_file", "list_files"],
   "answerKeywords": ["8080"],
   "answerResponses": {

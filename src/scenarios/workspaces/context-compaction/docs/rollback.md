@@ -1,0 +1,1 @@
+Rollback guide: pause the rollout, compare error rates with the previous window, and notify the release owner before reverting. Keep the change ticket open until health checks pass. The guide applies to every production region.
