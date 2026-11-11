@@ -348,7 +348,6 @@ export function Simulator({
           <div className="simulator-header-actions">
             <button
               className="back-button"
-              disabled={compactionRequired}
               onClick={() => {
                 if (
                   window.confirm(
