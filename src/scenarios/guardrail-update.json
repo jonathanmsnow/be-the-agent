@@ -15,10 +15,10 @@
   "readOnlyPaths": {
     "config/deployment.json": "Update config/deployment-overrides.json instead."
   },
-  "answerKeywords": ["software", "block"],
+  "answerKeywords": ["2.6.3"],
   "answerResponses": {
-    "correct": "Correct. The surrounding software enforces the protected-path rule, so the model cannot bypass it by ignoring or repeating an instruction.",
-    "incorrect": "Not quite. Prompt instructions can guide the model, but they cannot guarantee that a file will never be edited."
+    "correct": "Correct. The approved release is 2.6.3. Include it in the deployment override rather than changing the source configuration.",
+    "incorrect": "Please confirm the approved release number from the release approval record before updating deployment metadata."
   },
   "hints": [
     "Inspect the deployment files and approval record before making an edit.",

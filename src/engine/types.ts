@@ -39,6 +39,7 @@ export interface Entry {
   text: string;
   tokens: number;
   evicted?: boolean;
+  isSummary?: boolean;
 }
 
 export interface ToolCall {

@@ -129,11 +129,14 @@ export function reducer(
       return {
         ...state,
         log: [
-          ...state.log.filter((entry) => entry.role === ROLE.SYSTEM),
+          ...state.log.filter(
+            (entry) => entry.role === ROLE.SYSTEM && !entry.isSummary,
+          ),
           {
             role: ROLE.SYSTEM,
             text: summary,
             tokens: calculateTokens(summary),
+            isSummary: true,
           },
         ],
       };
