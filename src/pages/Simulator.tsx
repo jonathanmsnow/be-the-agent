@@ -20,6 +20,7 @@ import {
 import { ContextIndicator } from "../components/ContextTracker";
 import { ToolView } from "../components/ToolView";
 import { SummaryPrompt } from "../components/SummaryPrompt";
+import { HintDialog } from "../components/HintDialog";
 import { ResourceExperience } from "../components/ResourceExperience";
 import {
   resourceLinkForId,
@@ -40,6 +41,8 @@ const TOOL_CALL_TIP_MAX_DELAY_MS = 5 * 60_000;
 const initial: State = {
   log: [],
   hintIndex: 0,
+  toolRunCount: 0,
+  toolRunsAtLastWrongAnswer: -1,
   answerStepIndex: 0,
   completed: false,
 };
@@ -48,6 +51,8 @@ function createInitialState(scenarioData: Scenario): State {
   const tools = formattedToolRegistry();
   return {
     hintIndex: 0,
+    toolRunCount: 0,
+    toolRunsAtLastWrongAnswer: -1,
     answerStepIndex: 0,
     completed: false,
     log: [
@@ -89,6 +94,8 @@ export function Simulator({
 
   const [toolsWidth, setToolsWidth] = useState(38);
   const [completionDismissed, setCompletionDismissed] = useState(false);
+  const [planningReflectionAnswered, setPlanningReflectionAnswered] =
+    useState(false);
   const [seenTips, setSeenTips] = useState(() => readSeen());
   const seenTipsRef = useRef(seenTips);
   const [activeTips, setActiveTips] = useState<
@@ -407,6 +414,7 @@ export function Simulator({
           onModeSwitch={(anchor) => showTip("request-mode", anchor)}
           onAnswerFocus={(anchor) => showTip("answer-required", anchor)}
           onEmptyAnswer={(anchor) => openTip("answer-required", anchor, true)}
+          planning={scenarioData.planning}
           onAnswer={remindOriginalRequestAfterWrongAnswer}
           onToolRun={() => {
             markToolRun();
@@ -501,18 +509,46 @@ export function Simulator({
             aria-labelledby="completion-title"
           >
             <h2 id="completion-title">Scenario complete</h2>
-            <p>
-              You answered all questions correctly. You can continue to interact
-              with the environment if you wish.
-            </p>
-            <button
-              className="action-button"
-              onClick={() => setCompletionDismissed(true)}
-            >
-              Continue exploring
-            </button>
+            {scenarioData.planning?.required && !planningReflectionAnswered ? (
+              <>
+                <p>
+                  You answered all questions correctly. Did writing a plan help
+                  you decide what to do next?
+                </p>
+                <div className="reflection-actions">
+                  {["Yes", "A little", "Not yet"].map((answer) => (
+                    <button
+                      key={answer}
+                      className="action-button"
+                      onClick={() => setPlanningReflectionAnswered(true)}
+                    >
+                      {answer}
+                    </button>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <>
+                <p>
+                  You answered all questions correctly. You can continue to
+                  interact with the environment if you wish.
+                </p>
+                <button
+                  className="action-button"
+                  onClick={() => setCompletionDismissed(true)}
+                >
+                  Continue exploring
+                </button>
+              </>
+            )}
           </section>
         </div>
+      )}
+      {state.pendingHint && (
+        <HintDialog
+          hint={state.pendingHint}
+          onClose={() => dispatch({ type: "DISMISS_HINT" })}
+        />
       )}
       {activeTips.map((activeTip) => {
         const tip = scenarioTips.find(

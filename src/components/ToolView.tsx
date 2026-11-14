@@ -4,11 +4,13 @@ import { ToolExecution, type ToolAction } from "./ToolExecution";
 import { ToolList } from "./ToolList";
 import { requestTemplate } from "./requestTemplate";
 import { HelpTipTrigger } from "./HelpTip";
+import { PlanningPrompt } from "./PlanningPrompt";
+import type { Scenario } from "../engine/types";
 
 export function ToolView({
   tools,
   dispatch,
-  disabled = false,
+  disabled: toolsDisabled = false,
   onViewRangeFocus,
   onModeSwitch,
   onToolsHelp,
@@ -16,6 +18,7 @@ export function ToolView({
   onAnswerFocus,
   onEmptyAnswer,
   onAnswer,
+  planning,
 }: {
   tools: ToolDef[];
   dispatch: Dispatch<ToolAction>;
@@ -27,11 +30,16 @@ export function ToolView({
   onAnswerFocus?: (anchor: HTMLElement) => void;
   onEmptyAnswer?: (anchor: HTMLElement) => void;
   onAnswer?: (text: string) => void;
+  planning?: Scenario["planning"];
 }) {
   const [selectedTool, setSelectedTool] = useState(tools[0]);
   const [rawRequest, setRawRequest] = useState(() =>
     tools[0] ? requestTemplate(tools[0]) : "",
   );
+  const [planningComplete, setPlanningComplete] = useState(
+    !planning?.required,
+  );
+  const disabled = toolsDisabled || !planningComplete;
 
   const selectTool = (tool: ToolDef) => {
     setSelectedTool(tool);
@@ -40,6 +48,13 @@ export function ToolView({
 
   return (
     <div className="tool-client">
+      {planning?.required && !planningComplete && (
+        <PlanningPrompt
+          prompt={planning.prompt}
+          dispatch={dispatch}
+          onComplete={() => setPlanningComplete(true)}
+        />
+      )}
       <div className="tool-section-label">
         <span>TOOLS</span>
         <HelpTipTrigger

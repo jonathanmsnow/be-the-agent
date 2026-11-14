@@ -12,6 +12,9 @@ import type { VirtualFileSystem } from "../engine/virtualFileSystem";
 export interface State {
   log: Entry[];
   hintIndex: number;
+  toolRunCount: number;
+  toolRunsAtLastWrongAnswer: number;
+  pendingHint?: string;
   answerStepIndex: number;
   completed: boolean;
 }
@@ -28,6 +31,23 @@ export function reducer(
   fileSystem: VirtualFileSystem,
 ): State {
   switch (action.type) {
+    case ActionType.PLAN: {
+      const plan = action.text?.trim() || "";
+      if (!plan) return state;
+
+      const thinking = `Thinking: ${plan}`;
+      return {
+        ...state,
+        log: [
+          ...state.log,
+          {
+            role: ROLE.AGENT,
+            text: thinking,
+            tokens: calculateTokens(thinking),
+          },
+        ],
+      };
+    }
     case ActionType.RUN: {
       const callText = `${action.call?.tool} ${
         typeof action.call?.args === "string"
@@ -58,6 +78,7 @@ export function reducer(
         : undefined;
       return {
         ...state,
+        toolRunCount: state.toolRunCount + 1,
         log: [
           ...state.log,
           {
@@ -83,11 +104,21 @@ export function reducer(
       const keywords = step?.keywords ?? scenarioData.answerKeywords ?? [];
       const answer = action.text ?? "";
       const ok = keywords.every((k) => answer.includes(k));
+      const canProgressHelp =
+        state.hintIndex === 0 ||
+        state.toolRunCount > state.toolRunsAtLastWrongAnswer;
       const response = ok
         ? (step?.response.correct ?? scenarioData.answerResponses?.correct ?? "")
         : (step?.response.incorrect ?? scenarioData.answerResponses?.incorrect ?? "");
+      const help =
+        !ok && scenarioData.hints[state.hintIndex] && canProgressHelp
+          ? scenarioData.hints[state.hintIndex]
+          : !ok && state.hintIndex > 0 && !canProgressHelp
+            ? "Before asking for more help, use a tool to gather new evidence and revise your response."
+            : undefined;
       return {
         ...state,
+        pendingHint: help,
         log: [
           ...state.log,
           {
@@ -100,17 +131,13 @@ export function reducer(
             text: response,
             tokens: calculateTokens(response),
           },
-          ...(!ok && scenarioData.hints[state.hintIndex]
-            ? [
-                {
-                  role: ROLE.USER,
-                  text: scenarioData.hints[state.hintIndex],
-                  tokens: calculateTokens(scenarioData.hints[state.hintIndex]),
-                },
-              ]
-            : []),
         ],
-        hintIndex: ok ? state.hintIndex : state.hintIndex + 1,
+        hintIndex: ok || !canProgressHelp ? state.hintIndex : state.hintIndex + 1,
+        toolRunsAtLastWrongAnswer: ok
+          ? state.toolRunsAtLastWrongAnswer
+          : canProgressHelp
+            ? state.toolRunCount
+            : state.toolRunsAtLastWrongAnswer,
         answerStepIndex:
           ok && step
             ? Math.min(state.answerStepIndex + 1, scenarioData.answerSteps!.length - 1)
@@ -122,6 +149,11 @@ export function reducer(
               state.answerStepIndex === scenarioData.answerSteps.length - 1)),
       };
     }
+    case ActionType.DISMISS_HINT:
+      return {
+        ...state,
+        pendingHint: undefined,
+      };
     case ActionType.SUMMARY: {
       const summary = action.text?.trim() || "";
       if (!summary) return state;

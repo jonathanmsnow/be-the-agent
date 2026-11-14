@@ -845,6 +845,44 @@
   line-height: 1.5;
 }
 
+.reflection-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.hint-dialog-backdrop {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgb(0 0 0 / 60%);
+}
+
+.hint-dialog {
+  width: min(100%, 460px);
+  padding: 24px;
+  border: 1px solid var(--accent-border);
+  border-radius: 8px;
+  background: var(--bg);
+  box-shadow: 0 12px 40px rgb(0 0 0 / 35%);
+}
+
+.hint-dialog h2 {
+  margin: 0;
+  color: var(--text-h);
+  font-size: 20px;
+}
+
+.hint-dialog p {
+  margin: 12px 0 20px;
+  color: var(--text);
+  font-family: var(--sans);
+  line-height: 1.5;
+}
+
 .summary-prompt {
   margin: 16px 0;
   padding: 16px;
@@ -892,6 +930,55 @@
   min-height: 0;
   flex-direction: column;
   padding: 12px 0 24px;
+}
+
+.planning-prompt {
+  margin-bottom: 16px;
+  padding: 12px;
+  border: 1px solid var(--accent-border);
+  border-radius: 5px;
+  background: var(--accent-bg);
+}
+
+.planning-prompt-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--text-h);
+  font-size: 14px;
+}
+
+.planning-prompt-heading span {
+  color: var(--accent);
+  font-size: 10px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.planning-prompt p {
+  margin: 8px 0 12px;
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.planning-editor {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 72px;
+  resize: vertical;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 8px;
+  color: var(--text-h);
+  background: var(--code-bg);
+  font: 11px/1.5 var(--mono);
+}
+
+.planning-error {
+  color: var(--error) !important;
 }
 
 .tool-section-label,

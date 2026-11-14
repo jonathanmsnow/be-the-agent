@@ -9,6 +9,10 @@ export interface Scenario {
   briefing: { from: string; message: string };
   contextTracking?: boolean;
   contextLimit?: number;
+  planning?: {
+    required: boolean;
+    prompt?: string;
+  };
   files: Record<string, { content: string }>;
   protectedPaths?: string[];
   readOnlyPaths?: Record<string, string>;
@@ -51,9 +55,11 @@ export interface ToolCall {
 }
 
 export const ActionType = {
+  PLAN: "PLAN",
   RUN: "RUN",
   ANSWER: "ANSWER",
   SUMMARY: "SUMMARY",
+  DISMISS_HINT: "DISMISS_HINT",
 } as const;
 
 export type ActionType = (typeof ActionType)[keyof typeof ActionType];

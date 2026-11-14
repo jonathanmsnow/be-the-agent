@@ -39,7 +39,7 @@
     }
   ],
   "hints": [
-    "You have tools for reviewing files. You should have access to read any files needed.",
-    "The values are spread across production-region.json, release-track.yaml, and the approved change record."
+    "Pause before requesting more help: identify which release fact is missing and which file would provide direct evidence.",
+    "Use the file list and inspect the release files one at a time. Do not infer values from defaults or protected environment files."
   ]
 }
