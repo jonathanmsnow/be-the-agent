@@ -244,7 +244,7 @@ export function Simulator({
 
   const remindOriginalRequestAfterWrongAnswer = (answer: string) => {
     const step = scenarioData.answerSteps?.[state.answerStepIndex];
-    const keywords = step?.keywords ?? scenarioData.answerKeywords;
+    const keywords = step?.keywords ?? scenarioData.answerKeywords ?? [];
     const tip = tipForTarget(scenarioTips, "original-user-request");
     if (
       tip &&

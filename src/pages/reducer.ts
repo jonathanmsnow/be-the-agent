@@ -80,12 +80,12 @@ export function reducer(
     }
     case ActionType.ANSWER: {
       const step = scenarioData.answerSteps?.[state.answerStepIndex];
-      const keywords = step?.keywords ?? scenarioData.answerKeywords;
+      const keywords = step?.keywords ?? scenarioData.answerKeywords ?? [];
       const answer = action.text ?? "";
       const ok = keywords.every((k) => answer.includes(k));
       const response = ok
-        ? (step?.response ?? scenarioData.answerResponses.correct)
-        : scenarioData.answerResponses.incorrect;
+        ? (step?.response.correct ?? scenarioData.answerResponses?.correct ?? "")
+        : (step?.response.incorrect ?? scenarioData.answerResponses?.incorrect ?? "");
       return {
         ...state,
         log: [

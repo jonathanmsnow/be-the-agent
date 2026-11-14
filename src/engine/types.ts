@@ -12,14 +12,17 @@ export interface Scenario {
   files: Record<string, { content: string }>;
   protectedPaths?: string[];
   readOnlyPaths?: Record<string, string>;
-  answerKeywords: string[];
-  answerResponses: {
+  answerKeywords?: string[];
+  answerResponses?: {
     correct: string;
     incorrect: string;
   };
   answerSteps?: {
     keywords: string[];
-    response: string;
+    response: {
+      correct: string;
+      incorrect: string;
+    };
   }[];
   toolInterrupts?: Record<string, string>;
   hints: string[];
