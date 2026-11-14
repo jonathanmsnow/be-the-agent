@@ -554,8 +554,6 @@ export function Simulator({
           if (!tip || !topic) return null;
           return (
             <ResourceExperience
-              title={tip.title}
-              body={tip.hoverBody}
               topic={topic}
               onClose={() => setResourceTipId(null)}
             />

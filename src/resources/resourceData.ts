@@ -2,6 +2,7 @@ import resources from "./resources.json";
 
 export interface ResourceLink {
   label: string;
+  time?: string;
   href: string;
 }
 
@@ -15,6 +16,19 @@ export interface ResourceImage {
   };
 }
 
+export type ResourceContentBlock =
+  | {
+      type: "paragraph";
+      text: string;
+    }
+  | {
+      type: "image";
+      src: string;
+      alt: string;
+      caption?: string;
+      attribution?: ResourceImage["attribution"];
+    };
+
 export interface Resource {
   title: string;
   description?: string;
@@ -25,6 +39,7 @@ export interface ResourceTopic {
   id: string;
   title: string;
   description?: string;
+  content?: ResourceContentBlock[];
   resources?: Resource[];
   image?: ResourceImage;
 }

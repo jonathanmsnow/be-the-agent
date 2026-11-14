@@ -3,14 +3,20 @@
     "topics": [
       {
         "title": "What is an agent?",
-        "description": "AI systems that can act autonomously to achieve goals, often using tools and reasoning.",
+        "content": [
+          {
+            "type": "paragraph",
+            "text": "AI systems that can act autonomously to achieve goals, often using tools and reasoning."
+          }
+        ],
         "resources": [
           {
             "title": "What is Agentic AI? (Stanford HAI)",
             "description": "Learn about the definition and characteristics of agentic AI.",
             "links": [
               {
-                "label": "Read (2 min)",
+                "label": "Read",
+                "time": "2 min",
                 "href": "https://hai.stanford.edu/ai-definitions/what-is-agentic-ai"
               }
             ]
@@ -20,7 +26,8 @@
             "description": "Explore the essential elements that make up an AI agent, including a walk through of a simple diagram.",
             "links": [
               {
-                "label": "Read (5 min)",
+                "label": "Read",
+                "time": "5 min",
                 "href": "https://blog.n8n.io/ai-agents/#what-are-the-key-components-of-an-ai-agent"
               }
             ]
@@ -30,11 +37,13 @@
             "description": "Learn about the concept of agents and how they can be used to solve software problems.",
             "links": [
               {
-                "label": "Read (10 min)",
+                "label": "Read",
+                "time": "10 min",
                 "href": "https://www.ibm.com/think/topics/agentic-coding"
               },
               {
-                "label": "Watch (10 min)",
+                "label": "Watch",
+                "time": "10 min",
                 "href": "https://www.youtube.com/watch?v=PjrXaC5UsIw"
               }
             ]
@@ -44,18 +53,25 @@
       },
       {
         "title": "What is Tool Calling?",
-        "description": "Agents can use tools to interact with their environment and other systems, enabling them to perform complex tasks.",
+        "content": [
+          {
+            "type": "paragraph",
+            "text": "Agents can use tools to interact with their environment and other systems, enabling them to perform complex tasks. While a large language model (LLM) can reason over and produce text, it can't interact with external tools, APIs, or systems on its own. When we provide tools to an agent it allows the agent to take actions in the environment and pull in information that wasn't in the LLM's training data."
+          }
+        ],
         "resources": [
           {
             "title": "What is tool calling? (IBM)",
             "description": "Learn how agents use tools to interact with their environment and other systems.",
             "links": [
               {
-                "label": "Read (10 min)",
+                "label": "Read",
+                "time": "10 min",
                 "href": "https://www.ibm.com/think/topics/tool-calling"
               },
               {
-                "label": "Watch (5 min)",
+                "label": "Watch",
+                "time": "5 min",
                 "href": "https://www.youtube.com/watch?v=h8gMhXYAv1k"
               }
             ]
@@ -65,7 +81,8 @@
             "description": "See how tool calling is used in real-world applications.",
             "links": [
               {
-                "label": "Listen (45 min)",
+                "label": "Listen",
+                "time": "45 min",
                 "href": "https://practicalai.show/303"
               }
             ]
@@ -75,23 +92,30 @@
       },
       {
         "title": "What is Context Management?",
-        "description": "Learn how agents manage and utilize context to make informed decisions.",
-        "image": {
-          "src": "https://haystack.deepset.ai/blog/context-engineering/context-growth.png",
-          "alt": "Diagram showing how an agent's context window grows over time.",
-          "caption": "Context window growth over time.",
-          "attribution": {
-            "label": "Haystack by deepset: Context Engineering",
-            "href": "https://haystack.deepset.ai/blog/context-engineering"
+        "content": [
+          {
+            "type": "paragraph",
+            "text": "Large Language Models (LLMs) have a limited context window, which is the amount of input (commonly text) that it can process at one time to complete a task (Stanford AI). Given this constraint, when an LLM is wrapped in an agent harness, one of its tasks is managing this context. The important piece to understand is that the limitation on the context an agent can work with at any one time makes managing context critical. There are many approaches to this including just dropping older context and summarizing the current context using an LLM. The resources below dive deeper into how context management works in real agents."
+          },
+          {
+            "type": "image",
+            "src": "https://haystack.deepset.ai/blog/context-engineering/context-growth.png",
+            "alt": "Diagram showing how an agent's context window grows over time.",
+            "caption": "Context window growth over time.",
+            "attribution": {
+              "label": "Haystack by deepset: Context Engineering",
+              "href": "https://haystack.deepset.ai/blog/context-engineering"
+            }
           }
-        },
+        ],
         "resources": [
           {
             "title": "Context Window (Stanford HAI)",
             "description": "Understand the core definition of a context window.",
             "links": [
               {
-                "label": "Read (1 min)",
+                "label": "Read",
+                "time": "1 min",
                 "href": "https://hai.stanford.edu/ai-definitions/what-is-a-context-window"
               }
             ]
@@ -101,11 +125,13 @@
             "description": "Understand what a context window is and why it's important in AI.",
             "links": [
               {
-                "label": "Read (10 min)",
+                "label": "Read",
+                "time": "10 min",
                 "href": "https://www.ibm.com/think/topics/context-window"
               },
               {
-                "label": "Watch (10 min)",
+                "label": "Watch",
+                "time": "10 min",
                 "href": "https://www.youtube.com/watch?v=-QVoIxEpFkM"
               }
             ]
@@ -115,7 +141,8 @@
             "description": "Learn how GitHub Copilot manages context windows to improve performance.",
             "links": [
               {
-                "label": "Read (5 min)",
+                "label": "Read",
+                "time": "5 min",
                 "href": "https://docs.github.com/en/copilot/concepts/prompting-and-context/context-management#compaction"
               }
             ]
@@ -126,16 +153,22 @@
       {
         "id": "tokens",
         "title": "What are Tokens?",
-        "description": "Tokens are small pieces of text that make up an AI model's context. Models process text as tokens rather than whole words, and token counts show how much context is being used.",
-        "image": {
-          "src": "/images/tokenization-comparison.png",
-          "alt": "Comparison of how GPT-2, BERT, and T5 split the sentence The quick brown fox jumps over the lazy dog. Token counts and vocabulary sizes differ by tokenizer.",
-          "caption": "The same sentence can be divided into different tokens by different models.",
-          "attribution": {
-            "label": "Context Lab tokenization demo",
-            "href": "https://context-lab.com/llm-course/demos/tokenization/"
+        "content": [
+          {
+            "type": "paragraph",
+            "text": "Tokens are small pieces of text that make up an AI model's context. Models process text as tokens rather than whole words, and token counts show how much context is being used."
+          },
+          {
+            "type": "image",
+            "src": "/images/tokenization-comparison.png",
+            "alt": "Comparison of how GPT-2, BERT, and T5 split the sentence The quick brown fox jumps over the lazy dog. Token counts and vocabulary sizes differ by tokenizer.",
+            "caption": "The same sentence can be divided into different tokens by different models.",
+            "attribution": {
+              "label": "Context Lab tokenization demo",
+              "href": "https://context-lab.com/llm-course/demos/tokenization/"
+            }
           }
-        },
+        ],
         "resources": [
           {
             "title": "Understanding tokens (Microsoft)",
@@ -144,6 +177,40 @@
               {
                 "label": "Read",
                 "href": "https://learn.microsoft.com/en-us/dotnet/ai/conceptual/understanding-tokens"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "agent-harness",
+        "title": "What is an Agent Harness?",
+        "content": [
+          {
+            "type": "paragraph",
+            "text": "An agent harness is a framework or environment that allows an AI agent to interact with tools, APIs, and other systems. It provides the necessary infrastructure for the agent to perform tasks, manage context, and make decisions effectively."
+          }
+        ],
+        "resources": [
+          {
+            "title": "What is an Agent Harness?",
+            "description": "Learn how a harness combines with a model to create an agent.",
+            "links": [
+              {
+                "label": "Read",
+                "time": "15 min",
+                "href": "https://www.databricks.com/blog/ai-harness"
+              }
+            ]
+          },
+          {
+            "title": "AI Model vs Agentic Harness: What Actually Drives AI",
+            "description": "Learn the difference between AI models and agentic harnesses and how they interact.",
+            "links": [
+              {
+                "label": "Watch",
+                "time": "9 min",
+                "href": "https://www.youtube.com/watch?v=ZELPNFXJ4_o"
               }
             ]
           }

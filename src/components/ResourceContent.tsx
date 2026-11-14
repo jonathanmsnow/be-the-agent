@@ -1,5 +1,7 @@
 import { Link } from "./Link";
 import type {
+  ResourceContentBlock,
+  ResourceImage,
   ResourceSectionData,
   ResourceTopic,
 } from "../resources/resourceData";
@@ -7,22 +9,17 @@ import type {
 export function ResourceContent({
   section,
   openTopicTitle,
-  title,
-  intro,
   image,
   collapsible = true,
 }: {
   section: ResourceSectionData;
   openTopicTitle?: string;
-  title?: string;
-  intro?: string;
   image?: ResourceTopic["image"];
   collapsible?: boolean;
 }) {
   return (
     <section className="resource-section">
-      {(title ?? section.title) && <h2>{title ?? section.title}</h2>}
-      {intro && <p className="resource-content-intro">{intro}</p>}
+      {section.title && <h2>{section.title}</h2>}
       {section.topics.map((topic) => (
         <ResourceTopicDetails
           key={topic.title}
@@ -46,25 +43,15 @@ function ResourceTopicDetails({
 }) {
   const content = (
     <div className="resource-topic-content">
-      {topic.description && <p>{topic.description}</p>}
-      {topic.image && (
-        <figure className="resource-figure">
-          <img src={topic.image.src} alt={topic.image.alt} />
-          {topic.image.caption && <figcaption>{topic.image.caption}</figcaption>}
-          {topic.image.attribution && (
-            <figcaption>
-              Image:{" "}
-              <a
-                href={topic.image.attribution.href}
-                target="_blank"
-                rel="noreferrer"
-              >
-                {topic.image.attribution.label}
-              </a>
-            </figcaption>
-          )}
-        </figure>
-      )}
+      {topic.content
+        ? topic.content.map((block, index) => (
+            <ResourceContentBlockView
+              key={`${block.type}-${index}`}
+              block={block}
+            />
+          ))
+        : topic.description && <p>{topic.description}</p>}
+      {!topic.content && topic.image && <ResourceImageView image={topic.image} />}
       {topic.resources && (
         <>
           <h4>Further reading</h4>
@@ -77,7 +64,10 @@ function ResourceTopicDetails({
                   {resource.links.map((link, index) => (
                     <span key={link.href}>
                       {index > 0 && " or "}
-                      <Link href={link.href}>{link.label}</Link>
+                      <Link href={link.href}>
+                        {link.label}
+                        {link.time && ` (${link.time})`}
+                      </Link>
                     </span>
                   ))}
                 </span>
@@ -95,6 +85,32 @@ function ResourceTopicDetails({
         <h3>{topic.title}</h3>
         {content}
       </div>
+    );
+  }
+
+  function ResourceContentBlockView({ block }: { block: ResourceContentBlock }) {
+    if (block.type === "paragraph") return <p>{block.text}</p>;
+    return <ResourceImageView image={block} />;
+  }
+
+  function ResourceImageView({ image }: { image: ResourceImage }) {
+    return (
+      <figure className="resource-figure">
+        <img src={image.src} alt={image.alt} />
+        {image.caption && <figcaption>{image.caption}</figcaption>}
+        {image.attribution && (
+          <figcaption>
+            Image:{" "}
+            <a
+              href={image.attribution.href}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {image.attribution.label}
+            </a>
+          </figcaption>
+        )}
+      </figure>
     );
   }
 
