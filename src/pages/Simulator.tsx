@@ -95,6 +95,7 @@ export function Simulator({
   const [completionDismissed, setCompletionDismissed] = useState(false);
   const [planningReflectionAnswered, setPlanningReflectionAnswered] =
     useState(false);
+  const [planningReflectionChoice, setPlanningReflectionChoice] = useState("");
   const [planningReflection, setPlanningReflection] = useState("");
   const [seenTips, setSeenTips] = useState(() => readSeen());
   const seenTipsRef = useRef(seenTips);
@@ -520,21 +521,41 @@ export function Simulator({
             </ul>
             {scenarioData.planning && !planningReflectionAnswered ? (
               <>
-                <p>You answered all questions correctly. How did your plan compare with what you actually did?</p>
-                <div className="reflection-actions">
+                <p>
+                  You answered all questions correctly. Which best describes
+                  your plan and how it changed while you worked?
+                </p>
+                <fieldset className="reflection-options">
+                  <legend className="sr-only">
+                    How your plan changed while you worked
+                  </legend>
                   {[
-                    "Yes, mostly",
-                    "I changed it when evidence changed",
+                    "My actions mostly followed my plan",
+                    "I revised my plan when evidence changed",
                     "I started without a useful plan",
                   ].map((answer) => (
-                    <button
-                      key={answer}
-                      className="action-button"
-                      onClick={() => setPlanningReflectionAnswered(true)}
-                    >
-                      {answer}
-                    </button>
+                    <label className="reflection-option" key={answer}>
+                      <input
+                        type="radio"
+                        name="planning-reflection"
+                        value={answer}
+                        checked={planningReflectionChoice === answer}
+                        onChange={(event) =>
+                          setPlanningReflectionChoice(event.target.value)
+                        }
+                      />
+                      <span>{answer}</span>
+                    </label>
                   ))}
+                </fieldset>
+                <div className="reflection-actions">
+                  <button
+                    className="action-button"
+                    disabled={!planningReflectionChoice}
+                    onClick={() => setPlanningReflectionAnswered(true)}
+                  >
+                    Continue
+                  </button>
                 </div>
               </>
             ) : (
