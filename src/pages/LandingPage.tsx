@@ -14,10 +14,13 @@ export function LandingPage({
   return (
     <main className="landing">
       <section className="hero">
+        <div className="eyebrow">FOR SOFTWARE ENGINEERS</div>
         <h1>Think like an agent.</h1>
         <p>
-          Practice navigating messy context, choosing the right tools, and
-          finding the answer before your context window runs out.
+          Working with an agent is a lot like using the terminal: read the
+          available context, run the right command, inspect the output, and
+          decide what to do next. Use skills you already have to see what
+          happens under the hood of agentic coding tools.
         </p>
       </section>
       <section className="intro-section" aria-labelledby="how-it-works">
@@ -27,18 +30,23 @@ export function LandingPage({
         <div className="intro-grid">
           <Card
             icon="◎"
-            title="Explore context"
-            description="Learn to find the details that matter in a messy information space."
+            title="See the loop"
+            description="Watch context, tool calls, results, and compaction change as you work."
           />
           <Card
             icon="↗"
-            title="Choose your tools"
-            description="Practice deciding which action will move your investigation forward."
+            title="Work like you already do"
+            description="Apply terminal and debugging habits to realistic engineering tasks."
           />
           <Card
             icon="✓"
-            title="Make the call"
-            description="Build confidence turning evidence into a clear, useful answer."
+            title="Make one decision at a time"
+            description="Choose tools, inspect evidence, and recover when your first step is wrong."
+          />
+          <Card
+            icon="↗"
+            title="Take the insight with you"
+            description="Finish with a clearer mental model for using agentic coding tools."
           />
         </div>
       </section>

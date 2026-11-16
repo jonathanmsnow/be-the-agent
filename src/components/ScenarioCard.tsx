@@ -31,6 +31,9 @@ export function ScenarioCard({ scenario, onAction }: ScenarioCard) {
         </div>
       }
     >
+      <p className="scenario-transfer">
+        <strong>Practice:</strong> {scenario.transfer}
+      </p>
       <button
         className="start-button"
         onClick={(event) => {

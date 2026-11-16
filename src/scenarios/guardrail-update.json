@@ -3,6 +3,7 @@
   "title": "Protected Deployment Update",
   "difficulty": 4,
   "description": "Update deployment configuration while learning which safety rules must be enforced by tools rather than model instructions.",
+  "transfer": "Making precise changes within safety constraints",
   "contextTracking": true,
   "contextLimit": 1250,
   "system": "You are a helpful coding assistant. Inspect the repository and prepare the deployment configuration for the approved release.",

@@ -509,6 +509,15 @@ export function Simulator({
             aria-labelledby="completion-title"
           >
             <h2 id="completion-title">Scenario complete</h2>
+            <p>You practiced:</p>
+            <ul className="completion-capabilities">
+              <li>Reading only relevant context</li>
+              <li>Choosing tools from available capabilities</li>
+              <li>Using results to decide next steps</li>
+              {scenarioData.contextTracking && (
+                <li>Preserving useful state through compaction</li>
+              )}
+            </ul>
             {scenarioData.planning && !planningReflectionAnswered ? (
               <>
                 <p>You answered all questions correctly. How did your plan compare with what you actually did?</p>
@@ -531,7 +540,8 @@ export function Simulator({
             ) : (
               <>
                 <p>
-                  What would you do differently next time?
+                  What did you plan before acting, and what would you do
+                  differently next time?
                 </p>
                 <textarea
                   className="reflection-editor"
