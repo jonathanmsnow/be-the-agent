@@ -5,6 +5,7 @@ import type {
   ResourceSectionData,
   ResourceTopic,
 } from "../resources/resourceData";
+import { Disclosure } from "./Disclosure";
 
 export function ResourceContent({
   section,
@@ -115,9 +116,8 @@ function ResourceTopicDetails({
   }
 
   return (
-    <details className="resource-topic" open={open}>
-      <summary>{topic.title}</summary>
+    <Disclosure className="resource-topic" title={topic.title} open={open}>
       {content}
-    </details>
+    </Disclosure>
   );
 }

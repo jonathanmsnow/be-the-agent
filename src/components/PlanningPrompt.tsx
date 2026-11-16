@@ -1,14 +1,10 @@
 import { useRef, useState, type FormEvent } from "react";
+import { Disclosure } from "./Disclosure";
 
-export function PlanningPrompt({
-  prompt,
-}: {
-  prompt?: string;
-}) {
+export function PlanningPrompt({ prompt }: { prompt?: string }) {
   const [plan, setPlan] = useState("");
   const [error, setError] = useState("");
   const [planHistory, setPlanHistory] = useState<string[]>([]);
-  const [skipped, setSkipped] = useState(false);
   const detailsRef = useRef<HTMLDetailsElement>(null);
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
@@ -21,16 +17,15 @@ export function PlanningPrompt({
     }
     setError("");
     setPlanHistory((history) => [...history, trimmedPlan]);
-    setSkipped(false);
     setPlan("");
   };
 
   return (
-    <details className="planning-prompt" ref={detailsRef}>
-      <summary className="planning-prompt-heading">
-        <strong>Plan before acting</strong>
-        <span>{planHistory.length ? "history saved privately" : "optional and private"}</span>
-      </summary>
+    <Disclosure
+      className="planning-prompt"
+      title={<strong>Plan before acting</strong>}
+      detailsRef={detailsRef}
+    >
       <form onSubmit={submit}>
         <p>
           {prompt ??
@@ -56,16 +51,6 @@ export function PlanningPrompt({
         <button className="action-button" type="submit" disabled={!plan.trim()}>
           Save plan
         </button>
-        <button
-          className="planning-skip"
-          type="button"
-          onClick={() => {
-            setSkipped(true);
-            detailsRef.current?.removeAttribute("open");
-          }}
-        >
-          Skip for now
-        </button>
       </form>
       {planHistory.length > 0 && (
         <div className="planning-history" aria-label="Plan history">
@@ -77,11 +62,6 @@ export function PlanningPrompt({
           </ol>
         </div>
       )}
-      {skipped && (
-        <p className="planning-status" role="status">
-          Planning skipped. Reopen this panel if you want to make a plan.
-        </p>
-      )}
-    </details>
+    </Disclosure>
   );
 }

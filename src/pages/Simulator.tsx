@@ -47,7 +47,7 @@ const initial: State = {
 };
 
 function createInitialState(scenarioData: Scenario): State {
-  const tools = formattedToolRegistry();
+  const tools = formattedToolRegistry(scenarioData.tools);
   return {
     hintIndex: 0,
     toolRunCount: 0,
@@ -549,7 +549,7 @@ export function Simulator({
                     Finish reflection
                   </button>
                   <button
-                    className="planning-skip"
+                    className="reflection-skip"
                     onClick={() => setCompletionDismissed(true)}
                   >
                     Continue without writing

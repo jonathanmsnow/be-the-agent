@@ -9,9 +9,16 @@ export const TOOL_REGISTRY: Record<
   ToolDef<z.ZodObject<any>>
 > = Object.fromEntries([readFile, listFiles, editFile].map((t) => [t.name, t]));
 
-export const prettyPrintToolRegistry = () => {
+export const prettyPrintToolRegistry = (toolNames?: string[]) => {
+  const tools = toolNames
+    ? toolNames.flatMap((name) => {
+        const tool = TOOL_REGISTRY[name];
+        return tool ? [tool] : [];
+      })
+    : Object.values(TOOL_REGISTRY);
+
   return JSON.stringify(
-    Object.values(TOOL_REGISTRY).map((t) => {
+    tools.map((t) => {
       return {
         name: t.name,
         description: t.description,
