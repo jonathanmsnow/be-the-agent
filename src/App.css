@@ -942,10 +942,16 @@
 
 .planning-prompt-heading {
   display: flex;
+  cursor: pointer;
   justify-content: space-between;
   gap: 12px;
+  list-style: none;
   color: var(--text-h);
   font-size: 14px;
+}
+
+.planning-prompt-heading::-webkit-details-marker {
+  display: none;
 }
 
 .planning-prompt-heading span {
@@ -953,6 +959,21 @@
   font-size: 10px;
   letter-spacing: 0.3px;
   text-transform: uppercase;
+}
+
+.planning-prompt-heading::before {
+  margin-right: 8px;
+  color: var(--accent);
+  content: "▸";
+  transition: transform 120ms ease;
+}
+
+.planning-prompt[open] .planning-prompt-heading::before {
+  transform: rotate(90deg);
+}
+
+.planning-prompt form {
+  margin-top: 8px;
 }
 
 .planning-prompt p {
@@ -968,6 +989,65 @@
   box-sizing: border-box;
   width: 100%;
   min-height: 72px;
+  resize: vertical;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 8px;
+  color: var(--text-h);
+  background: var(--code-bg);
+  font: 11px/1.5 var(--mono);
+}
+
+.planning-prompt .action-button {
+  margin-top: 12px;
+}
+
+.planning-skip {
+  margin: 12px 0 0 8px;
+  border: 0;
+  padding: 6px;
+  color: var(--text);
+  background: transparent;
+  font: 11px/1.5 var(--mono);
+}
+
+.planning-status {
+  margin-bottom: 0 !important;
+  color: var(--accent) !important;
+}
+
+.planning-status span {
+  color: var(--text-h);
+}
+
+.planning-history {
+  margin-top: 16px;
+  color: var(--text);
+  font: 11px/1.5 var(--mono);
+}
+
+.planning-history strong {
+  color: var(--accent);
+  font-size: 10px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.planning-history ol {
+  margin: 6px 0 0;
+  padding-left: 20px;
+}
+
+.planning-history li {
+  margin-top: 4px;
+  color: var(--text-h);
+}
+
+.reflection-editor {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 12px 0;
   resize: vertical;
   border: 1px solid var(--border);
   border-radius: 5px;

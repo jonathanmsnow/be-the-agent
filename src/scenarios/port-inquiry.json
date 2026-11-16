@@ -5,8 +5,8 @@
   "description": "Help the operations team identify the port number that the server is listening on by making tool calls.",
   "contextTracking": false,
   "planning": {
-    "required": true,
-    "prompt": "Before touching the workspace, write one short sentence about what you need to do. Your thinking note will be added to the context window."
+    "required": false,
+    "prompt": "Optional: predict your next step and what evidence would confirm it. This private note will not be added to the context window."
   },
   "system": "You are a helpful assistant. Answer the user's question.",
   "briefing": {
@@ -20,7 +20,7 @@
     "incorrect": "No, that didn't seem to be the right port."
   },
   "hints": [
-    "Pause before requesting more help: what have you already inspected, and what evidence is still missing?",
-    "Use the file list to narrow your search, then inspect the configuration file most likely to contain the server port."
+    "Make sure you are using your tools. It should be in a file here in the project.",
+    "Make sure you list the files in the project, then check the configuration files since I think the port is specified there."
   ]
 }

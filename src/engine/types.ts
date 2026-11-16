@@ -55,11 +55,9 @@ export interface ToolCall {
 }
 
 export const ActionType = {
-  PLAN: "PLAN",
   RUN: "RUN",
   ANSWER: "ANSWER",
   SUMMARY: "SUMMARY",
-  DISMISS_HINT: "DISMISS_HINT",
 } as const;
 
 export type ActionType = (typeof ActionType)[keyof typeof ActionType];

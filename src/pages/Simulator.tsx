@@ -20,7 +20,6 @@ import {
 import { ContextIndicator } from "../components/ContextTracker";
 import { ToolView } from "../components/ToolView";
 import { SummaryPrompt } from "../components/SummaryPrompt";
-import { HintDialog } from "../components/HintDialog";
 import { ResourceExperience } from "../components/ResourceExperience";
 import {
   resourceLinkForId,
@@ -96,6 +95,7 @@ export function Simulator({
   const [completionDismissed, setCompletionDismissed] = useState(false);
   const [planningReflectionAnswered, setPlanningReflectionAnswered] =
     useState(false);
+  const [planningReflection, setPlanningReflection] = useState("");
   const [seenTips, setSeenTips] = useState(() => readSeen());
   const seenTipsRef = useRef(seenTips);
   const [activeTips, setActiveTips] = useState<
@@ -509,14 +509,15 @@ export function Simulator({
             aria-labelledby="completion-title"
           >
             <h2 id="completion-title">Scenario complete</h2>
-            {scenarioData.planning?.required && !planningReflectionAnswered ? (
+            {scenarioData.planning && !planningReflectionAnswered ? (
               <>
-                <p>
-                  You answered all questions correctly. Did writing a plan help
-                  you decide what to do next?
-                </p>
+                <p>You answered all questions correctly. How did your plan compare with what you actually did?</p>
                 <div className="reflection-actions">
-                  {["Yes", "A little", "Not yet"].map((answer) => (
+                  {[
+                    "Yes, mostly",
+                    "I changed it when evidence changed",
+                    "I started without a useful plan",
+                  ].map((answer) => (
                     <button
                       key={answer}
                       className="action-button"
@@ -530,25 +531,34 @@ export function Simulator({
             ) : (
               <>
                 <p>
-                  You answered all questions correctly. You can continue to
-                  interact with the environment if you wish.
+                  What would you do differently next time?
                 </p>
-                <button
-                  className="action-button"
-                  onClick={() => setCompletionDismissed(true)}
-                >
-                  Continue exploring
-                </button>
+                <textarea
+                  className="reflection-editor"
+                  value={planningReflection}
+                  onChange={(event) => setPlanningReflection(event.target.value)}
+                  rows={3}
+                  placeholder="One adjustment I would make is..."
+                  aria-label="What you would do differently next time"
+                />
+                <div className="reflection-actions">
+                  <button
+                    className="action-button"
+                    onClick={() => setCompletionDismissed(true)}
+                  >
+                    Finish reflection
+                  </button>
+                  <button
+                    className="planning-skip"
+                    onClick={() => setCompletionDismissed(true)}
+                  >
+                    Continue without writing
+                  </button>
+                </div>
               </>
             )}
           </section>
         </div>
-      )}
-      {state.pendingHint && (
-        <HintDialog
-          hint={state.pendingHint}
-          onClose={() => dispatch({ type: "DISMISS_HINT" })}
-        />
       )}
       {activeTips.map((activeTip) => {
         const tip = scenarioTips.find(

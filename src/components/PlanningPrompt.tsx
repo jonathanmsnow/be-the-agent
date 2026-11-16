@@ -1,18 +1,15 @@
-import { useState, type FormEvent } from "react";
-import { ActionType } from "../engine/types";
-import type { Action } from "../pages/reducer";
+import { useRef, useState, type FormEvent } from "react";
 
 export function PlanningPrompt({
   prompt,
-  dispatch,
-  onComplete,
 }: {
   prompt?: string;
-  dispatch: React.Dispatch<Action>;
-  onComplete: () => void;
 }) {
   const [plan, setPlan] = useState("");
   const [error, setError] = useState("");
+  const [planHistory, setPlanHistory] = useState<string[]>([]);
+  const [skipped, setSkipped] = useState(false);
+  const detailsRef = useRef<HTMLDetailsElement>(null);
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -22,42 +19,69 @@ export function PlanningPrompt({
       setError("Add a little more detail so your intention is clear.");
       return;
     }
-
     setError("");
-    dispatch({ type: ActionType.PLAN, text: trimmedPlan });
-    onComplete();
+    setPlanHistory((history) => [...history, trimmedPlan]);
+    setSkipped(false);
+    setPlan("");
   };
 
   return (
-    <form className="planning-prompt" onSubmit={submit}>
-      <div className="planning-prompt-heading">
+    <details className="planning-prompt" ref={detailsRef}>
+      <summary className="planning-prompt-heading">
         <strong>Plan before acting</strong>
-        <span>adds to context</span>
-      </div>
-      <p>
-        {prompt ??
-          "Write one short sentence about what you need to do before you act. This thinking note will be added to your context window; tools are one way to carry out your plan."}
-      </p>
-      <textarea
-        className="planning-editor"
-        value={plan}
-        onChange={(event) => {
-          setPlan(event.target.value);
-          setError("");
-        }}
-        placeholder="Example: I will gather evidence before responding."
-        aria-label="One sentence plan"
-        minLength={10}
-        rows={2}
-      />
-      {error && (
-        <p className="planning-error" role="alert">
-          {error}
+        <span>{planHistory.length ? "history saved privately" : "optional and private"}</span>
+      </summary>
+      <form onSubmit={submit}>
+        <p>
+          {prompt ??
+            "Predict your next step and what evidence would confirm it. This private note will not be added to your context window."}
+        </p>
+        <textarea
+          className="planning-editor"
+          value={plan}
+          onChange={(event) => {
+            setPlan(event.target.value);
+            setError("");
+          }}
+          placeholder="Example: I will gather evidence before responding."
+          aria-label="One sentence plan"
+          minLength={10}
+          rows={2}
+        />
+        {error && (
+          <p className="planning-error" role="alert">
+            {error}
+          </p>
+        )}
+        <button className="action-button" type="submit" disabled={!plan.trim()}>
+          Save plan
+        </button>
+        <button
+          className="planning-skip"
+          type="button"
+          onClick={() => {
+            setSkipped(true);
+            detailsRef.current?.removeAttribute("open");
+          }}
+        >
+          Skip for now
+        </button>
+      </form>
+      {planHistory.length > 0 && (
+        <div className="planning-history" aria-label="Plan history">
+          <strong>Plan history</strong>
+          <ol>
+            {planHistory.map((savedPlan, index) => (
+              <li key={`${savedPlan}-${index}`}>{savedPlan}</li>
+            ))}
+          </ol>
+        </div>
+      )}
+      {skipped && (
+        <p className="planning-status" role="status">
+          Planning skipped. Reopen this panel if you want to make a plan.
         </p>
       )}
-      <button className="action-button" type="submit" disabled={!plan.trim()}>
-        Add thinking and start
-      </button>
-    </form>
+    </details>
   );
 }

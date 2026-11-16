@@ -21,7 +21,7 @@
     "incorrect": "Please confirm the approved release number from the release approval record before updating deployment metadata."
   },
   "hints": [
-    "Pause before requesting more help: identify which approval evidence you still need before editing.",
-    "Inspect the deployment files and approval record. If the source is read-only, follow the tool's suggested override path rather than guessing."
+    "I believe the approved release number is in the release approval record, not in the deployment metadata.",
+    "The source deployment file is read-only, so the change needs to go through the deployment override rather than changing the source."
   ]
 }

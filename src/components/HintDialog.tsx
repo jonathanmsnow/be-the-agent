@@ -1,9 +1,11 @@
 import { useEffect, useRef } from "react";
 
 export function HintDialog({
+  sender,
   hint,
   onClose,
 }: {
+  sender: string;
   hint: string;
   onClose: () => void;
 }) {
@@ -26,7 +28,7 @@ export function HintDialog({
         aria-modal="true"
         aria-labelledby="hint-dialog-title"
       >
-        <h2 id="hint-dialog-title">Guided help</h2>
+        <h2 id="hint-dialog-title">{sender}</h2>
         <p>{hint}</p>
         <button
           ref={closeButtonRef}
@@ -34,7 +36,7 @@ export function HintDialog({
           type="button"
           onClick={onClose}
         >
-          Return to investigation
+          Back to task
         </button>
       </section>
     </div>

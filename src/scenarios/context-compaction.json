@@ -39,7 +39,7 @@
     }
   ],
   "hints": [
-    "Pause before requesting more help: identify which release fact is missing and which file would provide direct evidence.",
-    "Use the file list and inspect the release files one at a time. Do not infer values from defaults or protected environment files."
+    "Make sure you are checking the repository for direct evidence of the release details.",
+    "Make sure you inspect the release files one at a time. Do not infer values from defaults or protected environment files."
   ]
 }

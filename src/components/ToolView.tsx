@@ -36,10 +36,7 @@ export function ToolView({
   const [rawRequest, setRawRequest] = useState(() =>
     tools[0] ? requestTemplate(tools[0]) : "",
   );
-  const [planningComplete, setPlanningComplete] = useState(
-    !planning?.required,
-  );
-  const disabled = toolsDisabled || !planningComplete;
+  const disabled = toolsDisabled;
 
   const selectTool = (tool: ToolDef) => {
     setSelectedTool(tool);
@@ -48,13 +45,7 @@ export function ToolView({
 
   return (
     <div className="tool-client">
-      {planning?.required && !planningComplete && (
-        <PlanningPrompt
-          prompt={planning.prompt}
-          dispatch={dispatch}
-          onComplete={() => setPlanningComplete(true)}
-        />
-      )}
+      {planning && <PlanningPrompt prompt={planning.prompt} />}
       <div className="tool-section-label">
         <span>TOOLS</span>
         <HelpTipTrigger
