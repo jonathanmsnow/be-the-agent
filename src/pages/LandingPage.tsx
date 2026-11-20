@@ -14,14 +14,41 @@ export function LandingPage({
   return (
     <main className="landing">
       <section className="hero">
-        <div className="eyebrow">FOR SOFTWARE ENGINEERS</div>
         <h1>Think like an agent.</h1>
         <p>
-          Working with an agent is a lot like using the terminal: read the
-          available context, run the right command, inspect the output, and
-          decide what to do next. Use skills you already have to see what
-          happens under the hood of agentic coding tools.
+          Agents are AI systems are systems that interact with and observe their
+          environment. Just like a developer might use the terminal to run the
+          right command, inspect the output, and decide what to do next agents
+          follow a similar process.
         </p>
+        <p>
+          <b>Be the Agent</b> puts you in the role of one of these agents. Use
+          skills you already have to see what happens under the hood of agentic
+          coding tools.
+        </p>
+      </section>
+      <section
+        className="assessment-prompt"
+        aria-labelledby="assessment-heading"
+      >
+        <div className="assessment-prompt-content">
+          <div className="eyebrow">START HERE</div>
+          <h1 id="assessment-heading">Take the pre-assessment</h1>
+          <p>
+            Help us understand how effective "Be The Agent" is by completing a
+            short diagnostic assessment before you begin.
+          </p>
+        </div>
+        <div className="assessment-prompt-actions">
+          <a
+            className="assessment-button"
+            href="https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=u5ghSHuuJUuLem1_Mvqgg83cgJRvn8ZBjbFo9mhnAv9UMVJHSDNNOFlZS0hMQjVFWTVUWjk5UDdYMC4u"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Fill out pre-assessment <span aria-hidden="true">→</span>
+          </a>
+        </div>
       </section>
       <section className="intro-section" aria-labelledby="how-it-works">
         <h2 id="how-it-works" className="sr-only">
@@ -48,29 +75,6 @@ export function LandingPage({
             title="Take the insight with you"
             description="Finish with a clearer mental model for using agentic coding tools."
           />
-        </div>
-      </section>
-      <section
-        className="assessment-prompt"
-        aria-labelledby="assessment-heading"
-      >
-        <div className="assessment-prompt-content">
-          <div className="eyebrow">START HERE</div>
-          <h1 id="assessment-heading">Take the pre-assessment</h1>
-          <p>
-            Help us understand how effective "Be The Agent" is by completing a
-            short diagnostic assessment before you begin.
-          </p>
-        </div>
-        <div className="assessment-prompt-actions">
-          <a
-            className="assessment-button"
-            href="https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=u5ghSHuuJUuLem1_Mvqgg83cgJRvn8ZBjbFo9mhnAv9UMVJHSDNNOFlZS0hMQjVFWTVUWjk5UDdYMC4u"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Fill out pre-assessment <span aria-hidden="true">→</span>
-          </a>
         </div>
       </section>
       <section className="scenario-section" aria-labelledby="missions-heading">

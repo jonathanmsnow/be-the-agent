@@ -1,6 +1,7 @@
 import resources from "./resources.json";
 import contextGrowthImage from "../assets/context-growth.jpg";
 import tokenizationImage from "../assets/tokenization-comparison.png";
+import agentHarnessImage from "../assets/agent-harness.png";
 
 export interface ResourceLink {
   label: string;
@@ -54,6 +55,7 @@ export interface ResourceSectionData {
 const bundledImages: Record<string, string> = {
   "/assets/context-growth.jpg": contextGrowthImage,
   "/assets/tokenization-comparison.png": tokenizationImage,
+  "/assets/agent-harness.png": agentHarnessImage,
 };
 
 export const resourceSections = resources as Record<

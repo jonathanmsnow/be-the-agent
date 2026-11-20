@@ -203,7 +203,8 @@
 }
 
 .hero p {
-  max-width: 560px;
+  width: 100%;
+  max-width: none;
   color: var(--text);
   font-size: 18px;
 }
@@ -218,15 +219,15 @@
 
 .intro-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
 }
 
 .card {
   display: flex;
-  min-height: 190px;
-  gap: 18px;
-  padding: 24px;
+  min-height: 150px;
+  gap: 12px;
+  padding: 18px;
   border: 1px solid var(--border);
   border-radius: 14px;
   background: var(--code-bg);
@@ -266,12 +267,13 @@
 .card h3 {
   margin: 2px 0 8px;
   color: var(--text-h);
-  font-size: 20px;
+  font-size: 18px;
+  line-height: 1.2;
 }
 
 .card p {
   color: var(--text);
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1.5;
 }
 
@@ -1377,6 +1379,12 @@ textarea:focus-visible,
   outline-offset: 2px;
 }
 
+@media (max-width: 900px) {
+  .intro-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 600px) {
   .intro-grid {
     grid-template-columns: 1fr;
@@ -1388,7 +1396,6 @@ textarea:focus-visible,
   }
 
   .assessment-prompt {
-    margin: 500px;
     align-items: stretch;
     flex-direction: column;
     gap: 22px;

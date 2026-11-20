@@ -2,11 +2,11 @@
   "agent-concepts": {
     "topics": [
       {
-        "title": "What is an agent?",
+        "title": "What is an Agent?",
         "content": [
           {
             "type": "paragraph",
-            "text": "AI systems that can act autonomously to achieve goals, often using tools and reasoning."
+            "text": "Agents refer to AI systems that can act autonomously to achieve goals, often using tools and reasoning. AI agents are powered by a large language model (LLM) and an agent harness, which allows the agent to interact with tools, APIs, and other systems. Agents can be used for a variety of tasks, including research, coding, and more."
           }
         ],
         "resources": [
@@ -189,6 +189,16 @@
           {
             "type": "paragraph",
             "text": "An agent harness is a framework or environment that allows an AI agent to interact with tools, APIs, and other systems. It provides the necessary infrastructure for the agent to perform tasks, manage context, and make decisions effectively."
+          },
+          {
+            "type": "image",
+            "src": "/assets/agent-harness.png",
+            "alt": "Diagram showing how a harness wraps around a model to create an agent, allowing it to interact with tools and APIs.",
+            "caption": "A harness wraps around a model to create an agent. Simply model + harness = agent.",
+            "attribution": {
+              "label": "LangChain: Your Harness, Your Memory",
+              "href": "https://www.langchain.com/blog/your-harness-your-memory"
+            }
           }
         ],
         "resources": [
