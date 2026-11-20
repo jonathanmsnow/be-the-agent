@@ -1,6 +1,7 @@
-import type { ReactNode } from "react";
+import type { ComponentPropsWithoutRef, ReactNode } from "react";
 
-export interface CardProps {
+export interface CardProps
+  extends Omit<ComponentPropsWithoutRef<"article">, "children"> {
   icon: string;
   title: string;
   description: string;
@@ -16,10 +17,12 @@ export function Card({
   eyebrow,
   children,
   className = "",
+  ...articleProps
 }: CardProps) {
   return (
     <article
       className={`card ${className}`.trim()}
+      {...articleProps}
     >
       <div className="card-icon" aria-hidden="true">
         {icon}

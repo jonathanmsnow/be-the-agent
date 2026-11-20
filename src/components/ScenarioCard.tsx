@@ -15,6 +15,15 @@ export function ScenarioCard({ scenario, onAction }: ScenarioCard) {
   return (
     <Card
       className="scenario-card card--interactive"
+      role="button"
+      tabIndex={0}
+      onClick={() => onAction(scenario)}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          onAction(scenario);
+        }
+      }}
       icon="✦"
       title={scenario.title}
       description={scenario.description}
@@ -40,6 +49,7 @@ export function ScenarioCard({ scenario, onAction }: ScenarioCard) {
           event.stopPropagation();
           onAction(scenario);
         }}
+        onKeyDown={(event) => event.stopPropagation()}
       >
         Open simulator <span>→</span>
       </button>
