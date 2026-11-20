@@ -1,4 +1,6 @@
 import resources from "./resources.json";
+import contextGrowthImage from "../assets/context-growth.jpg";
+import tokenizationImage from "../assets/tokenization-comparison.png";
 
 export interface ResourceLink {
   label: string;
@@ -49,10 +51,28 @@ export interface ResourceSectionData {
   topics: ResourceTopic[];
 }
 
+const bundledImages: Record<string, string> = {
+  "/assets/context-growth.jpg": contextGrowthImage,
+  "/assets/tokenization-comparison.png": tokenizationImage,
+};
+
 export const resourceSections = resources as Record<
   string,
   ResourceSectionData
 >;
+
+for (const section of Object.values(resourceSections)) {
+  for (const topic of section.topics) {
+    if (topic.image) {
+      topic.image.src = bundledImages[topic.image.src] ?? topic.image.src;
+    }
+    for (const block of topic.content ?? []) {
+      if (block.type === "image") {
+        block.src = bundledImages[block.src] ?? block.src;
+      }
+    }
+  }
+}
 
 export function resourceTopicForId(id: string): ResourceTopic | null {
   for (const section of Object.values(resourceSections)) {

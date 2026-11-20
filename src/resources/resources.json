@@ -99,7 +99,7 @@
           },
           {
             "type": "image",
-            "src": "https://haystack.deepset.ai/blog/context-engineering/context-growth.png",
+            "src": "/assets/context-growth.jpg",
             "alt": "Diagram showing how an agent's context window grows over time.",
             "caption": "Context window growth over time.",
             "attribution": {
@@ -160,7 +160,7 @@
           },
           {
             "type": "image",
-            "src": "/images/tokenization-comparison.png",
+            "src": "/assets/tokenization-comparison.png",
             "alt": "Comparison of how GPT-2, BERT, and T5 split the sentence The quick brown fox jumps over the lazy dog. Token counts and vocabulary sizes differ by tokenizer.",
             "caption": "The same sentence can be divided into different tokens by different models.",
             "attribution": {
