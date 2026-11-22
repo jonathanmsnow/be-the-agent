@@ -427,17 +427,59 @@
   margin-left: 8px;
 }
 
+.scenario-eyebrow {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 7px;
+  margin-bottom: 6px;
+}
+
 .scenario-difficulty {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  margin-bottom: 6px;
   color: var(--accent);
   font-family: var(--mono);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.4px;
   text-transform: uppercase;
+}
+
+.scenario-status {
+  flex-shrink: 0;
+  padding: 3px 7px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text-h);
+  background: transparent;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.scenario-status-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.scenario-status-toggle input {
+  width: 12px;
+  height: 12px;
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+.scenario-status-toggle:hover,
+.scenario-status-toggle:focus-visible {
+  border-color: var(--accent-border);
+  color: var(--accent);
 }
 
 .scenario-difficulty-separator {

@@ -19,6 +19,9 @@ export function ToolView({
   onEmptyAnswer,
   onAnswer,
   planning,
+  planningDraft,
+  planningHistory,
+  onPlanningChange,
 }: {
   tools: ToolDef[];
   dispatch: Dispatch<ToolAction>;
@@ -31,6 +34,9 @@ export function ToolView({
   onEmptyAnswer?: (anchor: HTMLElement) => void;
   onAnswer?: (text: string) => void;
   planning?: Scenario["planning"];
+  planningDraft?: string;
+  planningHistory?: string[];
+  onPlanningChange?: (draft: string, history: string[]) => void;
 }) {
   const [selectedTool, setSelectedTool] = useState(tools[0]);
   const [rawRequest, setRawRequest] = useState(() =>
@@ -45,7 +51,14 @@ export function ToolView({
 
   return (
     <div className="tool-client">
-      {planning && <PlanningPrompt prompt={planning.prompt} />}
+      {planning && (
+        <PlanningPrompt
+          prompt={planning.prompt}
+          initialDraft={planningDraft}
+          initialHistory={planningHistory}
+          onChange={onPlanningChange}
+        />
+      )}
       <div className="tool-section-label">
         <span>TOOLS</span>
         <HelpTipTrigger

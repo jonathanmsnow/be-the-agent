@@ -33,6 +33,11 @@ import {
 import { calculateTokens } from "../utils";
 import { reducer, type Action, type State } from "./reducer";
 import { VirtualFileSystem } from "../engine/virtualFileSystem";
+import {
+  clearScenarioProgress,
+  loadScenarioProgress,
+  saveScenarioProgress,
+} from "../progress";
 
 const TOOL_CALL_TIP_INITIAL_DELAY_MS = 30_000;
 const TOOL_CALL_TIP_MAX_DELAY_MS = 5 * 60_000;
@@ -83,20 +88,40 @@ export function Simulator({
   onBack: () => void;
   onRestart: () => void;
 }) {
-  const [fileSystem] = useState(() => new VirtualFileSystem(scenarioData.files));
+  const [restoredProgress] = useState(() =>
+    loadScenarioProgress(scenarioData.id),
+  );
+  const [fileSystem] = useState(
+    () =>
+      new VirtualFileSystem(restoredProgress?.files ?? scenarioData.files),
+  );
   const [state, dispatch] = useReducer(
     (currentState: State, action: Action) =>
       reducer(currentState, action, scenarioData, fileSystem),
     initial,
-    () => createInitialState(scenarioData),
+    () => restoredProgress?.state ?? createInitialState(scenarioData),
   );
 
-  const [toolsWidth, setToolsWidth] = useState(38);
-  const [completionDismissed, setCompletionDismissed] = useState(false);
+  const [toolsWidth, setToolsWidth] = useState(
+    restoredProgress?.toolsWidth ?? 38,
+  );
+  const [completionDismissed, setCompletionDismissed] = useState(
+    restoredProgress?.completionDismissed ?? false,
+  );
   const [planningReflectionAnswered, setPlanningReflectionAnswered] =
-    useState(false);
-  const [planningReflectionChoice, setPlanningReflectionChoice] = useState("");
-  const [planningReflection, setPlanningReflection] = useState("");
+    useState(restoredProgress?.reflection.answered ?? false);
+  const [planningReflectionChoice, setPlanningReflectionChoice] = useState(
+    restoredProgress?.reflection.choice ?? "",
+  );
+  const [planningReflection, setPlanningReflection] = useState(
+    restoredProgress?.reflection.text ?? "",
+  );
+  const [planningDraft, setPlanningDraft] = useState(
+    restoredProgress?.planning.draft ?? "",
+  );
+  const [planningHistory, setPlanningHistory] = useState<string[]>(
+    restoredProgress?.planning.history ?? [],
+  );
   const [seenTips, setSeenTips] = useState(() => readSeen());
   const seenTipsRef = useRef(seenTips);
   const [activeTips, setActiveTips] = useState<
@@ -114,6 +139,62 @@ export function Simulator({
   const simulatorRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const toolRunCountRef = useRef(0);
+
+  const initialProgressSignature = useRef(
+    JSON.stringify({
+      state: restoredProgress?.state ?? createInitialState(scenarioData),
+      toolsWidth: restoredProgress?.toolsWidth ?? 38,
+      planning: {
+        draft: restoredProgress?.planning.draft ?? "",
+        history: restoredProgress?.planning.history ?? [],
+      },
+      reflection: {
+        answered: restoredProgress?.reflection.answered ?? false,
+        choice: restoredProgress?.reflection.choice ?? "",
+        text: restoredProgress?.reflection.text ?? "",
+      },
+      completionDismissed: restoredProgress?.completionDismissed ?? false,
+      files: restoredProgress?.files ?? scenarioData.files,
+    }),
+  );
+
+  useEffect(() => {
+    const snapshot = {
+      scenarioId: scenarioData.id,
+      state,
+      toolsWidth,
+      planning: { draft: planningDraft, history: planningHistory },
+      reflection: {
+        answered: planningReflectionAnswered,
+        choice: planningReflectionChoice,
+        text: planningReflection,
+      },
+      completionDismissed,
+      files: fileSystem.toJSON(),
+    };
+    const signature = JSON.stringify({
+      state: snapshot.state,
+      toolsWidth: snapshot.toolsWidth,
+      planning: snapshot.planning,
+      reflection: snapshot.reflection,
+      completionDismissed: snapshot.completionDismissed,
+      files: snapshot.files,
+    });
+    if (signature !== initialProgressSignature.current) {
+      saveScenarioProgress(snapshot);
+    }
+  }, [
+    scenarioData.id,
+    state,
+    toolsWidth,
+    planningDraft,
+    planningHistory,
+    planningReflectionAnswered,
+    planningReflectionChoice,
+    planningReflection,
+    completionDismissed,
+    fileSystem,
+  ]);
 
   const used: number = state.log.reduce(
     (sum, e) => sum + (e.evicted ? 0 : e.tokens),
@@ -359,7 +440,7 @@ export function Simulator({
               onClick={() => {
                 if (
                   window.confirm(
-                    "Leave this simulator? Current progress will be lost.",
+                    "Leave this simulator? Progress is saved automatically.",
                   )
                 ) {
                   onBack();
@@ -373,9 +454,10 @@ export function Simulator({
               onClick={() => {
                 if (
                   window.confirm(
-                    "Restart this scenario? Current progress will be lost.",
+                    "Restart this scenario? Saved progress will be cleared.",
                   )
                 ) {
+                  clearScenarioProgress(scenarioData.id);
                   onRestart();
                 }
               }}
@@ -416,6 +498,12 @@ export function Simulator({
           onAnswerFocus={(anchor) => showTip("answer-required", anchor)}
           onEmptyAnswer={(anchor) => openTip("answer-required", anchor, true)}
           planning={scenarioData.planning}
+          planningDraft={planningDraft}
+          planningHistory={planningHistory}
+          onPlanningChange={(draft, history) => {
+            setPlanningDraft(draft);
+            setPlanningHistory(history);
+          }}
           onAnswer={remindOriginalRequestAfterWrongAnswer}
           onToolRun={() => {
             markToolRun();

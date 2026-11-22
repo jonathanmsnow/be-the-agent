@@ -1,10 +1,20 @@
 import { useRef, useState, type FormEvent } from "react";
 import { Disclosure } from "./Disclosure";
 
-export function PlanningPrompt({ prompt }: { prompt?: string }) {
-  const [plan, setPlan] = useState("");
+export function PlanningPrompt({
+  prompt,
+  initialDraft = "",
+  initialHistory = [],
+  onChange,
+}: {
+  prompt?: string;
+  initialDraft?: string;
+  initialHistory?: string[];
+  onChange?: (draft: string, history: string[]) => void;
+}) {
+  const [plan, setPlan] = useState(initialDraft);
   const [error, setError] = useState("");
-  const [planHistory, setPlanHistory] = useState<string[]>([]);
+  const [planHistory, setPlanHistory] = useState<string[]>(initialHistory);
   const detailsRef = useRef<HTMLDetailsElement>(null);
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
@@ -16,7 +26,11 @@ export function PlanningPrompt({ prompt }: { prompt?: string }) {
       return;
     }
     setError("");
-    setPlanHistory((history) => [...history, trimmedPlan]);
+    setPlanHistory((history) => {
+      const next = [...history, trimmedPlan];
+      onChange?.("", next);
+      return next;
+    });
     setPlan("");
   };
 
@@ -35,8 +49,10 @@ export function PlanningPrompt({ prompt }: { prompt?: string }) {
           className="planning-editor"
           value={plan}
           onChange={(event) => {
-            setPlan(event.target.value);
+            const draft = event.target.value;
+            setPlan(draft);
             setError("");
+            onChange?.(draft, planHistory);
           }}
           placeholder="Example: I will gather evidence before responding."
           aria-label="One sentence plan"

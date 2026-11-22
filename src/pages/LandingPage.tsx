@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { JSX } from "react/jsx-runtime";
 import { Card } from "../components/Card";
 import { ScenarioCard } from "../components/ScenarioCard";
@@ -5,12 +6,16 @@ import { scenarios } from "../scenarios/scenarios";
 import type { Scenario } from "../engine/types";
 import { ResourceContent } from "../components/ResourceContent";
 import { resourceSections } from "../resources/resourceData";
+import { hasCompletedScenarioProgress } from "../progress";
 
 export function LandingPage({
   setSelectedScenario,
 }: {
   setSelectedScenario: (scenario: Scenario) => void;
 }): JSX.Element {
+  const [, setProgressRevision] = useState(0);
+  const hasCompletedScenario = hasCompletedScenarioProgress();
+
   return (
     <main className="landing">
       <section className="hero">
@@ -27,29 +32,31 @@ export function LandingPage({
           coding tools.
         </p>
       </section>
-      <section
-        className="assessment-prompt"
-        aria-labelledby="assessment-heading"
-      >
-        <div className="assessment-prompt-content">
-          <div className="eyebrow">START HERE</div>
-          <h1 id="assessment-heading">Take the pre-assessment</h1>
-          <p>
-            Help us understand how effective "Be The Agent" is by completing a
-            short diagnostic assessment before you begin.
-          </p>
-        </div>
-        <div className="assessment-prompt-actions">
-          <a
-            className="assessment-button"
-            href="https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=u5ghSHuuJUuLem1_Mvqgg83cgJRvn8ZBjbFo9mhnAv9UMVJHSDNNOFlZS0hMQjVFWTVUWjk5UDdYMC4u"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Fill out pre-assessment <span aria-hidden="true">→</span>
-          </a>
-        </div>
-      </section>
+      {!hasCompletedScenario && (
+        <section
+          className="assessment-prompt"
+          aria-labelledby="assessment-heading"
+        >
+          <div className="assessment-prompt-content">
+            <div className="eyebrow">START HERE</div>
+            <h1 id="assessment-heading">Take the pre-assessment</h1>
+            <p>
+              Help us understand how effective "Be The Agent" is by completing a
+              short diagnostic assessment before you begin.
+            </p>
+          </div>
+          <div className="assessment-prompt-actions">
+            <a
+              className="assessment-button"
+              href="https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=u5ghSHuuJUuLem1_Mvqgg83cgJRvn8ZBjbFo9mhnAv9UMVJHSDNNOFlZS0hMQjVFWTVUWjk5UDdYMC4u"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Fill out pre-assessment <span aria-hidden="true">→</span>
+            </a>
+          </div>
+        </section>
+      )}
       <section className="intro-section" aria-labelledby="how-it-works">
         <h2 id="how-it-works" className="sr-only">
           How it works
@@ -77,6 +84,31 @@ export function LandingPage({
           />
         </div>
       </section>
+      {hasCompletedScenario && (
+        <section
+          className="assessment-prompt"
+          aria-labelledby="post-assessment-heading"
+        >
+          <div className="assessment-prompt-content">
+            <div className="eyebrow">WHENEVER YOU'RE READY</div>
+            <h1 id="post-assessment-heading">Take the post-assessment</h1>
+            <p>
+              Whenever you feel ready, complete the final assessment to share
+              what changed after working through at least one scenario.
+            </p>
+          </div>
+          <div className="assessment-prompt-actions">
+            <a
+              className="assessment-button"
+              href="https://forms.cloud.microsoft/r/unDEFJ1h1r"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Fill out post-assessment <span aria-hidden="true">→</span>
+            </a>
+          </div>
+        </section>
+      )}
       <section className="scenario-section" aria-labelledby="missions-heading">
         <div className="section-heading">
           <div>
@@ -94,6 +126,9 @@ export function LandingPage({
               scenario={scenario}
               onAction={() => {
                 setSelectedScenario(scenario);
+              }}
+              onReset={() => {
+                setProgressRevision((revision) => revision + 1);
               }}
             />
           ))}

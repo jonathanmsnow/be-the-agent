@@ -71,6 +71,12 @@ export class VirtualFileSystem {
     return `Updated ${normalizedPath}`;
   }
 
+  toJSON(): Record<string, VirtualFile> {
+    return Object.fromEntries(
+      [...this.files.entries()].map(([path, file]) => [path, { ...file }]),
+    );
+  }
+
   replaceInFile(path: string, find: string, replace: string): string {
     const normalizedPath = normalizePath(path);
     const file = this.files.get(normalizedPath);

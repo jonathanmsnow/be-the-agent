@@ -3,6 +3,7 @@ import { LandingPage } from "./pages/LandingPage";
 import { Simulator } from "./pages/Simulator";
 import { scenarios } from "./scenarios/scenarios";
 import type { Scenario } from "./engine/types";
+import { clearScenarioProgress } from "./progress";
 
 const SIMULATOR_ROUTE_PREFIX = "#/simulator/";
 
@@ -60,7 +61,10 @@ export default function App() {
         key={scenarioKey}
         scenarioData={selectedScenario}
         onBack={leaveSimulator}
-        onRestart={() => setScenarioKey((key) => key + 1)}
+        onRestart={() => {
+          clearScenarioProgress(selectedScenario.id);
+          setScenarioKey((key) => key + 1);
+        }}
       />
     );
   }
