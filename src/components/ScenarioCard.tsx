@@ -40,10 +40,7 @@ export function ScenarioCard({ scenario, onAction, onReset }: ScenarioCard) {
       description={scenario.description}
       eyebrow={
         <div className="scenario-eyebrow">
-          <label
-            className="scenario-status scenario-status-toggle"
-            onClick={(event) => event.stopPropagation()}
-          >
+          <label className="scenario-status scenario-status-toggle">
             <input
               type="checkbox"
               checked={completed}
